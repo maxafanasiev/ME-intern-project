@@ -1,18 +1,13 @@
-import os
-
 from fastapi import FastAPI
+import uvicorn
+
+from routers import healthschecker
+
 
 app = FastAPI()
 
-
-@app.get("/")
-async def root():
-    response_data = {"status_code": 200,
-                     "detail": "ok",
-                     "result": "working",
-                     }
-    return response_data
+app.include_router(healthschecker.router)
 
 
 if __name__ == "__main__":
-    os.system("uvicorn app.main:app --reload")
+    uvicorn.run('main:app', host="127.0.0.1", port=8000, reload=True)
