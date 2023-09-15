@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "me-intern-project"
+version = "0.1.0"
+description = ""
+authors = ["maxafanasiev <80445276+maxafanasiev@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "me_intern_project"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+uvicorn = "^0.23.2"
+fastapi = "^0.103.1"
+alembic = "^1.12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
