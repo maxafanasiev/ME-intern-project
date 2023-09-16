@@ -3,14 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from routers import healthschecker
-from core.config import settings
-
+from core.fastapi_config import FastAPIConfig
 
 app = FastAPI()
 
 origins = [
     "*"
 ]
+fastapi_settings = FastAPIConfig()
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,4 +24,4 @@ app.include_router(healthschecker.router)
 
 
 if __name__ == "__main__":
-    uvicorn.run('main:app', host=settings.host, port=settings.port, reload=settings.reload)
+    uvicorn.run('main:app', host=fastapi_settings.host, port=fastapi_settings.port, reload=fastapi_settings.reload)
