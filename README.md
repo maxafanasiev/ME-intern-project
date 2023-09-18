@@ -1,3 +1,6 @@
-start uvicorn command -> "python app/main.py"
-create docker image -> "docker build -t me-intern-fastapi ."
-run docker container -> "docker run -d -p 8000:8000 --name me-fastapi-app me-intern-fastapi"
+before run, you need to rename .env.example file and insert you credentials into it
+
+start uvicorn command ->    "python app/main.py"
+
+create docker image ->      "docker build -t me-intern-fastapi ."
+run docker container ->     "docker run -d -p ${SERVER_PORT:-8000}:8000 --name fastapiapp me-intern-fastapi"
