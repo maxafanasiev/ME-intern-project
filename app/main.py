@@ -5,7 +5,7 @@ from fastapi_cache import FastAPICache
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache.backends.redis import RedisBackend
 
-from routers import healthschecker
+from app.routers import healthschecker
 from app.core.config import FastAPIConfig, RedisConfig, origins
 
 fastapi_settings = FastAPIConfig()
