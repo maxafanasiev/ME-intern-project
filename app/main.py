@@ -1,16 +1,13 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 
-from routers import healthschecker
-from core.fastapi_config import FastAPIConfig
+from app.routers import healthschecker
+from app.core.config import FastAPIConfig, origins
+
+fastapi_settings = FastAPIConfig()
 
 app = FastAPI()
-
-origins = [
-    "*"
-]
-fastapi_settings = FastAPIConfig()
 
 app.add_middleware(
     CORSMiddleware,
