@@ -15,4 +15,4 @@ EXPOSE ${SERVER_PORT}
 
 COPY . .
 
-CMD ["python", "app/main.py"]
+#CMD ["python", "app/main.py"]
