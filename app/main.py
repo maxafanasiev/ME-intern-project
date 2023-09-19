@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache.backends.redis import RedisBackend
 
 from routers import healthschecker
-from app.core.config import FastAPIConfig, RedisConfig
+from app.core.config import FastAPIConfig, RedisConfig, origins
 
 fastapi_settings = FastAPIConfig()
 redis_settings = RedisConfig()
@@ -14,9 +14,6 @@ redis_settings = RedisConfig()
 app = FastAPI()
 redis = redisio.Redis(host=redis_settings.host, port=redis_settings.port, db=0)
 
-origins = [
-    "*"
-]
 
 app.add_middleware(
     CORSMiddleware,
