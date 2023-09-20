@@ -4,8 +4,13 @@ start uvicorn command       -> "python app/main.py"
 
 run tests                   -> "pytest"
 
-create docker image         -> "docker build -t me-intern-fastapi ."
-run docker container        -> "docker run -d -p ${SERVER_PORT:-8000}:8000 --name fastapiapp me-intern-fastapi"
 
-run docker-compose ->       "docker-compose up"
-rebuild ->                  "docker-compose up -d --build"
+create app docker image     -> "docker build -t fastapiapp -f Dockerfile.app ."
+create tests docker image   -> "docker build -t me-tests -f Dockerfile.tests ."
+create docker network       -> "docker network create api_net"
+run app docker container    -> "docker run -d --network api_net -p ${SERVER_PORT:-8000}:8000 --name fastapiapp fastapiapp ."
+run test docker container   -> "docker run -it --network api_net --name me-tests me-tests ."
+
+run docker-compose          -> "docker-compose up"
+rebuild                     -> "docker-compose up -d --build"
+stop docker-compose         -> "docker-compose down"

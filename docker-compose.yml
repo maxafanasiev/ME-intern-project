@@ -4,7 +4,7 @@ services:
     image: fastapiapp:latest
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.app
     command: python app/main.py
     ports:
       - "${SERVER_PORT}:8000"
@@ -13,10 +13,14 @@ services:
     depends_on:
       - redis
       - postgres
+    networks:
+      - mynetwork
   redis:
     image: redis:alpine
     expose:
       - ${REDIS_PORT}
+    networks:
+      - mynetwork
   postgres:
     image: postgres:12
     environment:
@@ -27,5 +31,9 @@ services:
       - ${POSTGRES_PORT}
     volumes:
       - ./postgres-data:/var/lib/postgresql/data &&  sudo chmod 0700 /var/lib/postgresql/data
+    networks:
+      - mynetwork
 volumes:
   postgres-data:
+networks:
+  mynetwork:

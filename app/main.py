@@ -5,15 +5,15 @@ from fastapi_cache import FastAPICache
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache.backends.redis import RedisBackend
 
+from app.db.db_connect import init_models
 from app.routers import healthschecker
 from app.core.config import FastAPIConfig, RedisConfig, origins
 
 fastapi_settings = FastAPIConfig()
 redis_settings = RedisConfig()
 
-app = FastAPI()
 redis = redisio.Redis(host=redis_settings.host, port=redis_settings.port, db=0)
-
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,7 +28,8 @@ app.include_router(healthschecker.router)
 
 @app.on_event("startup")
 async def startup_event():
-    FastAPICache.init(RedisBackend(redis), prefix='fastapi-cache')
+    await init_models()
+    FastAPICache.init(RedisBackend(redis), prefix='app-cache')
 
 
 @app.on_event("shutdown")
