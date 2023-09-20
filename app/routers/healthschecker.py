@@ -42,9 +42,8 @@ async def root():
 @router.get("/db_health")
 async def check_health():
     postgres_result = await check_postgres_db()
-    redis_result = await check_redis()
 
-    if postgres_result["postgres_status"] == "ok" and redis_result["redis_status"] == "ok":
+    if postgres_result["postgres_status"] == "ok":
         status_code = 200
         detail = "ok"
         result = "working"
@@ -58,6 +57,27 @@ async def check_health():
         "detail": detail,
         "result": result,
         "postgres_result": postgres_result,
+    }
+    return response_data
+
+
+@router.get("/redis_health")
+async def check_health():
+    redis_result = await check_redis()
+
+    if redis_result["redis_status"] == "ok":
+        status_code = 200
+        detail = "ok"
+        result = "working"
+    else:
+        status_code = 500
+        detail = "Internal Server Error"
+        result = "not working"
+
+    response_data = {
+        "status_code": status_code,
+        "detail": detail,
+        "result": result,
         "redis_result": redis_result
     }
     return response_data
