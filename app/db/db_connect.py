@@ -5,8 +5,7 @@ from app.core.config import DbConfig
 
 db_settings = DbConfig()
 
-DATABASE_URL = (f"{db_settings.service}://{db_settings.user}:{db_settings.password}"
-                f"@{db_settings.domain}:{db_settings.port}/{db_settings.name}")
+DATABASE_URL = db_settings.url
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 AsyncDBSession = AsyncSession(engine, expire_on_commit=False)

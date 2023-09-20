@@ -7,13 +7,6 @@ class User(BaseModel):
     user_email: EmailStr
     user_firstname: Optional[str] = None
     user_lastname: Optional[str] = None
-    user_status: Optional[str] = None
-    user_city: Optional[str] = None
-    user_phone: Optional[str] = None
-    user_links: Optional[List[str]] = None
-    user_avatar: Optional[str] = None
-    password: str
-    is_superuser: bool = False
 
 
 class SingInRequestModel(BaseModel):

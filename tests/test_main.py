@@ -3,7 +3,6 @@ import random
 import pytest
 from faker import Faker
 
-from app.services.auth import auth_service
 from app.main import redis
 
 fake = Faker()
@@ -11,6 +10,11 @@ fake = Faker()
 
 def test_read_root(test_client):
     response = test_client.get("/")
+    assert response.status_code == 200
+
+
+def test_db_heath(test_client):
+    response = test_client.get("/db_health/")
     assert response.status_code == 200
 
 
@@ -35,12 +39,6 @@ def test_sign_up(test_client):
     assert "user_email" in user_data
     assert "user_firstname" in user_data
     assert "user_lastname" in user_data
-    assert "user_status" in user_data
-    assert "user_city" in user_data
-    assert "user_phone" in user_data
-    assert "user_links" in user_data
-    assert "user_avatar" in user_data
-    assert "password" in user_data
 
 
 def test_password_hashing(test_client):
