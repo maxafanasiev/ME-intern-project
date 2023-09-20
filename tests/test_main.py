@@ -3,7 +3,6 @@ import random
 import pytest
 from faker import Faker
 
-from app.services.auth import auth_service
 from app.main import redis
 
 fake = Faker()
