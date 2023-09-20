@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, ARRAY, DateTime, func
 from sqlalchemy.orm import declarative_base
 
-
 Base = declarative_base()
 
 
@@ -17,8 +16,7 @@ class User(Base):
     user_phone = Column(String(20), nullable=True)
     user_links = Column(ARRAY(String), nullable=True)
     user_avatar = Column(String(255), nullable=True)
-    hashed_password = Column(String(255), nullable=False)
+    password = Column(String(255), nullable=False)
     is_superuser = Column(Boolean(), default=False)
     created_at = Column('crated_at', DateTime, default=func.now())
     updated_at = Column('updated_at', DateTime, default=func.now())
-

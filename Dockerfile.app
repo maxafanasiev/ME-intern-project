@@ -9,7 +9,7 @@ RUN pip install poetry
 COPY poetry.lock pyproject.toml ./
 
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi || echo "Poetry install failed"
+    && poetry install --no-interaction --no-ansi --no-dev|| echo "Poetry install failed"
 
 EXPOSE ${SERVER_PORT}
 

@@ -12,7 +12,7 @@ class User(BaseModel):
     user_phone: Optional[str] = None
     user_links: Optional[List[str]] = None
     user_avatar: Optional[str] = None
-    hashed_password: str
+    password: str
     is_superuser: bool = False
 
 
@@ -30,7 +30,7 @@ class SignUpRequestModel(BaseModel):
     user_phone: Optional[str] = None
     user_links: Optional[List[str]] = None
     user_avatar: Optional[str] = None
-    password: SecretStr
+    password: str
 
 
 class UserUpdateRequestModel(BaseModel):
@@ -40,7 +40,7 @@ class UserUpdateRequestModel(BaseModel):
     user_city: Optional[str] = Field(min_length=1, max_length=50)
     user_phone: Optional[str] = Field(min_length=1, max_length=50)
     user_links: Optional[List[str]] = None
-    user_avatar: Optional[str] = Field(min_length=1, max_length=255)
+    user_avatar: Optional[str] = None
     password: Optional[SecretStr] = Field(min_length=8, max_length=50)
 
 
