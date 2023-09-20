@@ -4,6 +4,7 @@ import pytest
 from faker import Faker
 
 from app.main import redis
+from app.services.auth import auth_service
 
 fake = Faker()
 
@@ -15,6 +16,11 @@ def test_read_root(test_client):
 
 def test_db_heath(test_client):
     response = test_client.get("/db_health/")
+    assert response.status_code == 200
+
+
+def test_redis_heath(test_client):
+    response = test_client.get("/redis_health/")
     assert response.status_code == 200
 
 
@@ -46,8 +52,3 @@ def test_password_hashing(test_client):
     hashed_password = auth_service.get_password_hash(password)
     verify_password = auth_service.verify_password(password, hashed_password)
     assert verify_password is True
-
-
-@pytest.mark.asyncio
-async def test_redis_connection(test_client, redis_connection=redis):
-    assert await redis_connection.ping() is True
