@@ -28,14 +28,14 @@ class SignUpRequestModel(BaseModel):
 
 
 class UserUpdateRequestModel(BaseModel):
-    user_firstname: Optional[str] = Field(min_length=1, max_length=50)
-    user_lastname: Optional[str] = Field(min_length=1, max_length=50)
-    user_status: Optional[str] = Field(min_length=1, max_length=50)
-    user_city: Optional[str] = Field(min_length=1, max_length=50)
-    user_phone: Optional[str] = Field(min_length=1, max_length=50)
+    user_firstname: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_lastname: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_status: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_city: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_phone: Optional[str] = Field(min_length=1, max_length=50, default=None)
     user_links: Optional[List[str]] = None
     user_avatar: Optional[str] = None
-    password: Optional[SecretStr] = Field(min_length=8, max_length=50)
+    password: Optional[str] = Field(min_length=8, max_length=50, default=None)
 
 
 class UserDetailResponse(BaseModel):

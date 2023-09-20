@@ -45,7 +45,8 @@ async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSessi
             raise HTTPException(status_code=404, detail="User not found")
         db_user.password = auth_service.get_password_hash(db_user.password)
         for field, value in user.model_dump().items():
-            setattr(db_user, field, value)
+            if value is not None:
+                setattr(db_user, field, value)
         await session.commit()
         await session.refresh(db_user)
         return db_user

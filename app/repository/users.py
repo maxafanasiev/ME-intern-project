@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User
 from app.schemas.user_schemas import SignUpRequestModel
-from app.services.auth import auth_service
 
 
 async def get_user_by_email(email: str, db: AsyncSession) -> User:
