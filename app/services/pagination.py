@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from typing import Type, Sequence, List
+from typing import Type
 
 from fastapi import Query, Depends
 from pydantic import BaseModel
