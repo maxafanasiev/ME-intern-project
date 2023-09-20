@@ -18,6 +18,11 @@ def test_db_heath(test_client):
     assert response.status_code == 200
 
 
+def test_redis_heath(test_client):
+    response = test_client.get("/redis_health/")
+    assert response.status_code == 200
+
+
 def test_sign_up(test_client):
     signup_data = {
         "user_email": fake.email(),
@@ -47,7 +52,3 @@ def test_password_hashing(test_client):
     verify_password = auth_service.verify_password(password, hashed_password)
     assert verify_password is True
 
-
-@pytest.mark.asyncio
-async def test_redis_connection(test_client, redis_connection=redis):
-    assert await redis_connection.ping() is True
