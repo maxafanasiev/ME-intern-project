@@ -4,9 +4,10 @@ from pydantic import BaseModel, EmailStr, SecretStr, Field
 
 
 class User(BaseModel):
-    user_email: EmailStr
-    user_firstname: Optional[str] = None
-    user_lastname: Optional[str] = None
+    user_id: int
+    user_email: str
+    user_firstname: str
+    user_lastname: str
 
 
 class SingInRequestModel(BaseModel):
@@ -15,7 +16,7 @@ class SingInRequestModel(BaseModel):
 
 
 class SignUpRequestModel(BaseModel):
-    user_email: str
+    user_email: EmailStr
     user_firstname: Optional[str] = None
     user_lastname: Optional[str] = None
     user_status: Optional[str] = None
@@ -37,10 +38,6 @@ class UserUpdateRequestModel(BaseModel):
     password: Optional[SecretStr] = Field(min_length=8, max_length=50)
 
 
-class UsersListResponse(BaseModel):
-    users: List[User]
-
-
 class UserDetailResponse(BaseModel):
     user_id: int
     user_email: str
@@ -52,3 +49,7 @@ class UserDetailResponse(BaseModel):
     user_links: List[str]
     user_avatar: str
     is_superuser: bool
+
+
+class UsersListResponse(BaseModel):
+    users: List[User]

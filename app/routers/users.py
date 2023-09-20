@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.db_connect import get_db
 from app.db.models import User
-from app.schemas.user_schemas import User as UserModel, UsersListResponse, SignUpRequestModel, UserDetailResponse, UserUpdateRequestModel
+from app.schemas.user_schemas import User as UserModel, UsersListResponse, SignUpRequestModel, UserDetailResponse, \
+    UserUpdateRequestModel
 from app.repository import users as repository_users
 from app.services.auth import auth_service
 from app.services.pagination import paginate
@@ -65,8 +66,19 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.get("/", response_model=UsersListResponse)
 async def read_users(
-    page: int = Query(1, description="Page number, starting from 1", ge=1),
-    size: int = Query(10, description="Number of items per page", le=1000),
-    db: AsyncSession = Depends(get_db)
+        page: int = Query(1, description="Page number, starting from 1", ge=1),
+        size: int = Query(10, description="Number of items per page", le=1000),
+        db: AsyncSession = Depends(get_db)
 ):
-    return await paginate(User, page, size, db)
+    result = await paginate(User, page, size, db)
+    user_list = [
+        UserModel(
+            user_id=user.user_id,
+            user_email=user.user_email,
+            user_firstname=user.user_firstname,
+            user_lastname=user.user_lastname,
+        )
+        for user in result
+    ]
+    print(user_list)
+    return {"users": user_list}
