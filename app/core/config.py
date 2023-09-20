@@ -1,6 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 origins = [
     "*"
 ]
@@ -30,5 +29,3 @@ class DbConfig(BaseSettings):
     port: int
 
     model_config = SettingsConfigDict(env_prefix="postgres_", env_file=".env", env_file_encoding="utf-8")
-
-
