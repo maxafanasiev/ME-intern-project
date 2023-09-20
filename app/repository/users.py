@@ -22,7 +22,6 @@ async def create_user(body: SignUpRequestModel, db: AsyncSession) -> User:
             body.user_avatar = avatar
         except Exception as e:
             print(e)
-    body.password = auth_service.get_password_hash(body.password)
     new_user = User(**body.model_dump())
     db.add(new_user)
     await db.commit()
