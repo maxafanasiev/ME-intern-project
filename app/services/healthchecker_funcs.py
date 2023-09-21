@@ -1,8 +1,15 @@
-
 import redis.asyncio as redisio
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.config import RedisConfig, DbConfig
+
+
+async def create_response(status_code, detail, result):
+    return {
+        "status_code": status_code,
+        "detail": detail,
+        "result": result,
+    }
 
 
 async def check_postgres_db():
@@ -25,3 +32,5 @@ async def check_redis():
         return {"redis_status": "ok"}
     except Exception as e:
         return {"redis_status": "error", "error_message": str(e)}
+
+
