@@ -1,3 +1,12 @@
+import random
+
+from faker import Faker
+
+from app.services.auth import auth_service
+
+fake = Faker()
+
+
 def test_read_root(test_client):
     response = test_client.get("/")
     assert response.status_code == 200
