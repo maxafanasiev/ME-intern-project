@@ -5,7 +5,7 @@ start uvicorn command       -> "python app/main.py"
 run tests                   -> "pytest"
 
 
-create app docker image     -> "docker build -t fastapiapp -f Dockerfile.app ."
+create app docker image     -> "docker build -t fastapiapp -f Dockerfile ."
 create tests docker image   -> "docker build -t me-tests -f Dockerfile.tests ."
 create docker network       -> "docker network create api_net"
 
