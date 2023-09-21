@@ -11,4 +11,3 @@ def test_db_heath(test_client):
 def test_redis_heath(test_client):
     response = test_client.get("/redis_health/")
     assert response.status_code == 200
-
