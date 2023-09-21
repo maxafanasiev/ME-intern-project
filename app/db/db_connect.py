@@ -5,9 +5,7 @@ from app.core.config import DbConfig
 
 db_settings = DbConfig()
 
-DATABASE_URL = db_settings.url
-
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(db_settings.url, echo=True)
 AsyncDBSession = AsyncSession(engine, expire_on_commit=False)
 Base = declarative_base()
 
