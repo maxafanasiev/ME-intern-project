@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.services.healthchecker_funcs import PostgresStatusChecker, RedisStatusChecker
+from app.services.healthchecker_services import PostgresStatusChecker, RedisStatusChecker
 
 router = APIRouter(tags=['healthchecker'])
 
