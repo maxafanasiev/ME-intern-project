@@ -32,7 +32,6 @@ app.include_router(users.router, prefix='/users')
 async def startup_event():
     await init_models()
     logger.info("App started")
-    await init_models()
     FastAPICache.init(RedisBackend(redis), prefix='app-cache')
 
 

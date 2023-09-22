@@ -6,9 +6,9 @@ from app.db.db_connect import get_db
 from app.db.models import User
 from app.schemas.user_schemas import User as UserModel, UsersListResponse, SignUpRequestModel, UserDetailResponse, \
     UserUpdateRequestModel
-from app.repository import users as repository_users
-from app.services.auth import auth_service
-from app.services.pagination import paginate
+from app.services.users_services import UserServices
+from app.services.auth_services import auth_service
+from app.services.pagination import Paginator
 from app.core.logger import logger
 
 router = APIRouter(tags=["users"])
@@ -18,11 +18,11 @@ router = APIRouter(tags=["users"])
 async def create_user(body: SignUpRequestModel, db: AsyncSession = Depends(get_db)):
     try:
         async with db as session:
-            exist_user = await repository_users.get_user_by_email(body.user_email, session)
+            exist_user = await UserServices.get_user_by_email(body.user_email, session)
             if exist_user:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
             body.password = auth_service.get_password_hash(body.password)
-            new_user = await repository_users.create_user(body, session)
+            new_user = await UserServices.create_user(body, session)
             return new_user
     except Exception as e:
         logger.error(f"Error create user: {str(e)}")
@@ -89,18 +89,9 @@ async def read_users(
         db: AsyncSession = Depends(get_db)
 ):
     try:
-        result = await paginate(User, page, size, db)
-        user_list = [
-            UserModel(
-                user_id=user.user_id,
-                user_email=user.user_email,
-                user_firstname=user.user_firstname,
-                user_lastname=user.user_lastname,
-            )
-            for user in result
-        ]
-        print(user_list)
-        return {"users": user_list}
+        pagination = Paginator(User)
+        result = await pagination.paginate(page, size, db)
+        return {"users": [user for user in result]}
     except Exception as e:
         logger.error(f"Error get users: {str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
