@@ -4,7 +4,7 @@ services:
     image: fastapiapp:latest
     build:
       context: .
-      dockerfile: Dockerfile.app
+      dockerfile: Dockerfile
     command: python app/main.py
     ports:
       - "${SERVER_PORT}:8000"
