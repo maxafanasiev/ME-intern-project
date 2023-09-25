@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import HTTPException, Depends, status, APIRouter, Query
+from fastapi import HTTPException, Depends, status, APIRouter, Query, Path
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,7 +16,9 @@ router = APIRouter(tags=["users"])
 
 
 @router.get("/{user_id}", response_model=UserDetailResponse)
-async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def read_user(user_id: int = Path(..., title="User ID", description="The ID of the user to get"),
+                    db: AsyncSession = Depends(get_db)
+                    ):
     async with db as session:
         stmt = select(User).where(User.user_id == user_id)
         result = await session.execute(stmt)
@@ -28,7 +30,10 @@ async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{user_id}", response_model=UserDetailResponse)
-async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSession = Depends(get_db)):
+async def update_user(user: UserUpdateRequestModel,
+                      user_id: int = Path(..., title="User ID", description="The ID of the user to update"),
+                      db: AsyncSession = Depends(get_db)
+                      ):
     async with db as session:
         stmt = select(User).where(User.user_id == user_id)
         result = await session.execute(stmt)
@@ -47,7 +52,8 @@ async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSessi
 
 
 @router.delete("/{user_id}", response_model=UserModel)
-async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_user(user_id: int = Path(..., title="User ID", description="The ID of the user to delete"),
+                      db: AsyncSession = Depends(get_db)):
     async with db as session:
         stmt = select(User).where(User.user_id == user_id)
         result = await session.execute(stmt)
