@@ -20,3 +20,4 @@ class User(Base):
     is_superuser = Column(Boolean(), default=False)
     created_at = Column('created_at', DateTime, default=func.now())
     updated_at = Column('updated_at', DateTime, default=func.now())
+    refresh_token = Column(String(255), nullable=True)

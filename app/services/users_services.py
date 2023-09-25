@@ -28,3 +28,8 @@ class UserServices:
         await db.commit()
         await db.refresh(new_user)
         return new_user
+
+    @staticmethod
+    async def update_token(user: User, token: str | None, db: AsyncSession) -> None:
+        user.refresh_token = token
+        await db.commit()

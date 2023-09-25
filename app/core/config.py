@@ -30,3 +30,10 @@ class DbConfig(BaseSettings):
     url: str
 
     model_config = SettingsConfigDict(env_prefix="postgres_", env_file=".env", env_file_encoding="utf-8")
+
+
+class JWTConfig(BaseSettings):
+    secret_key: str
+    algorithm: str
+
+    model_config = SettingsConfigDict(env_prefix="jwt_", env_file=".env", env_file_encoding="utf-8")

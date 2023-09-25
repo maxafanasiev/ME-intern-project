@@ -6,29 +6,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.db_connect import get_db
 from app.db.models import User
-from app.schemas.user_schemas import User as UserModel, UsersListResponse, SignUpRequestModel, UserDetailResponse, \
-    UserUpdateRequestModel
-from app.services.users_services import UserServices
+from app.schemas.user_schemas import User as UserModel, UsersListResponse, UserDetailResponse, UserUpdateRequestModel
 from app.services.auth_services import auth_service
 from app.services.pagination import Paginator
 from app.core.logger import logger
 
 router = APIRouter(tags=["users"])
-
-
-@router.post("/signup", response_model=UserModel, status_code=status.HTTP_201_CREATED)
-async def create_user(body: SignUpRequestModel, db: AsyncSession = Depends(get_db)):
-    try:
-        async with db as session:
-            exist_user = await UserServices.get_user_by_email(body.user_email, session)
-            if exist_user:
-                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
-            body.password = auth_service.get_password_hash(body.password)
-            new_user = await UserServices.create_user(body, session)
-            return new_user
-    except Exception as e:
-        logger.error(f"Error create user: {str(e)}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.get("/{user_id}", response_model=UserDetailResponse)
