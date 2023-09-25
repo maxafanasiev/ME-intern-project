@@ -31,6 +31,12 @@ def test_sign_up(test_client):
     signup_data.update({"user_id": user_data["user_id"]})
 
 
+def test_sign_up_again(test_client):
+    response = test_client.post("/users/signup", json=signup_data)
+
+    assert response.status_code == 409
+
+
 def test_get_user(test_client):
     user_id = signup_data["user_id"]
     response = test_client.get(f"/users/{user_id}")
@@ -44,6 +50,13 @@ def test_get_user(test_client):
     assert "user_lastname" in user_data
 
 
+def test_get_user_not_found(test_client):
+    user_id = 99999
+    response = test_client.get(f"/users/{user_id}")
+
+    assert response.status_code == 404
+
+
 def test_update_user(test_client):
     user_id = signup_data["user_id"]
     upgrade_data = {
@@ -53,6 +66,17 @@ def test_update_user(test_client):
     response = test_client.put(f"/users/{user_id}", json=upgrade_data)
 
     assert response.status_code == 200
+
+
+def test_update_user_not_found(test_client):
+    user_id = 99999
+    upgrade_data = {
+        "user_firstname": fake.first_name()[:50],
+        "user_lastname": fake.last_name()[:50],
+    }
+    response = test_client.put(f"/users/{user_id}", json=upgrade_data)
+
+    assert response.status_code == 404
 
 
 def test_get_users(test_client):
@@ -69,3 +93,10 @@ def test_delete_user(test_client):
     response = test_client.delete(f"/users/{user_id}")
 
     assert response.status_code == 200
+
+
+def test_delete_user_not_found(test_client):
+    user_id = 99999
+    response = test_client.delete(f"/users/{user_id}")
+
+    assert response.status_code == 404
