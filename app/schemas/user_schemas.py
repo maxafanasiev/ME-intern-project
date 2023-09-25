@@ -1,6 +1,7 @@
+from datetime import datetime
 from typing import Optional, List
 
-from pydantic import BaseModel, EmailStr, SecretStr, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class User(BaseModel):
@@ -49,6 +50,8 @@ class UserDetailResponse(BaseModel):
     user_links: List[str]
     user_avatar: str
     is_superuser: bool
+    created_at: datetime
+    updated_at: datetime
 
 
 class UsersListResponse(BaseModel):

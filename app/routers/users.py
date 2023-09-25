@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import HTTPException, Depends, status, APIRouter, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -54,6 +56,7 @@ async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSessi
             if db_user is None:
                 raise HTTPException(status_code=404, detail="User not found")
             db_user.password = auth_service.get_password_hash(db_user.password)
+            db_user.updated_at = datetime.now()
             for field, value in user.model_dump().items():
                 if value is not None:
                     setattr(db_user, field, value)
