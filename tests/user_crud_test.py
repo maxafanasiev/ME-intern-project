@@ -32,9 +32,7 @@ def test_sign_up(test_client):
 
 
 def test_get_user(test_client):
-    # user_id = signup_data["user_id"]
-    user_id = 20
-    print(user_id)
+    user_id = signup_data["user_id"]
     response = test_client.get(f"/users/{user_id}")
 
     assert response.status_code == 200

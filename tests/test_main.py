@@ -2,7 +2,7 @@ import random
 
 from faker import Faker
 
-from app.services.auth import auth_service
+from app.services.auth_services import auth_service
 
 fake = Faker()
 
