@@ -42,14 +42,14 @@ class UserUpdateRequestModel(BaseModel):
 class UserDetailResponse(BaseModel):
     user_id: int
     user_email: str
-    user_firstname: str
-    user_lastname: str
-    user_status: str
-    user_city: str
-    user_phone: str
-    user_links: List[str]
-    user_avatar: str
-    is_superuser: bool
+    user_firstname: Optional[str] = None
+    user_lastname: Optional[str] = None
+    user_status: Optional[str] = None
+    user_city: Optional[str] = None
+    user_phone: Optional[str] = None
+    user_links: Optional[List[str]] = None
+    user_avatar: Optional[str] = None
+    is_superuser: Optional[bool] = False
     created_at: datetime
     updated_at: datetime
 

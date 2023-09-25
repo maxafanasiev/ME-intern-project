@@ -33,10 +33,8 @@ async def signin(body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession =
     try:
         async with db as session:
             user = await UserServices.get_user_by_email(body.username, session)
-            if user is None:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email")
-            if not auth_service.verify_password(body.password, user.password):
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password")
+            if user is None or not auth_service.verify_password(body.password, user.password):
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
             access_token = await auth_service.create_access_token(data={"sub": user.user_email})
             refresh_token = await auth_service.create_refresh_token(data={"sub": user.user_email})
             await UserServices.update_token(user, refresh_token, session)

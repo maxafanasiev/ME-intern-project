@@ -37,3 +37,13 @@ class JWTConfig(BaseSettings):
     algorithm: str
 
     model_config = SettingsConfigDict(env_prefix="jwt_", env_file=".env", env_file_encoding="utf-8")
+
+
+class AUTH0Config(BaseSettings):
+    domain: str
+    api_audience: str
+    algorithm: str
+    issuer: str
+    secret_key: str
+
+    model_config = SettingsConfigDict(env_prefix="auth0_", env_file=".env", env_file_encoding="utf-8")

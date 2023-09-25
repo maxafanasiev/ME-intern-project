@@ -7,6 +7,7 @@ from app.schemas.user_schemas import SignUpRequestModel
 
 
 class UserServices:
+
     @staticmethod
     async def get_user_by_email(email: str, db: AsyncSession) -> User:
         stmt = select(User).where(User.user_email == email)
@@ -24,6 +25,20 @@ class UserServices:
             except Exception as e:
                 print(e)
         new_user = User(**body.model_dump())
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        return new_user
+
+    @staticmethod
+    async def create_auth0_user(email: str, name: str, password: str, db: AsyncSession) -> User:
+        data = {
+            "user_email": email,
+            "user_firstname": name.split()[0],
+            "user_lastname": name.split()[1],
+            "password": password
+        }
+        new_user = User(**data)
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
