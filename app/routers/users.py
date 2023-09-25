@@ -94,7 +94,7 @@ async def read_users(
     try:
         pagination = Paginator(User)
         result = await pagination.paginate(page, size, db)
-        return {"users": [user for user in result]}
+        return {"users": result}
     except Exception as e:
         logger.error(f"Error get users: {str(e)}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
