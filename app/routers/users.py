@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.db_connect import get_db
 from app.db.models import User
 from app.schemas.user_schemas import User as UserModel, UsersListResponse, UserDetailResponse, UserUpdateRequestModel
+from app.schemas.validation_schemas import UsersQueryParams
 from app.services.auth_services import auth_service
 from app.services.pagination import Paginator
 from app.core.logger import logger
@@ -60,11 +61,9 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/", response_model=UsersListResponse)
-async def read_users(
-        page: int = Query(1, description="Page number, starting from 1", ge=1),
-        size: int = Query(10, description="Number of items per page", le=1000),
-        db: AsyncSession = Depends(get_db)
-):
+async def read_users(params: UsersQueryParams = Depends(),
+                     db: AsyncSession = Depends(get_db)
+                     ):
     pagination = Paginator(User)
-    result = await pagination.paginate(page, size, db)
+    result = await pagination.paginate(params.page, params.size, db)
     return {"users": result}

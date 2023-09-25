@@ -23,44 +23,36 @@ async def create_user(body: SignUpRequestModel, db: AsyncSession = Depends(get_d
         body.password = auth_service.get_password_hash(body.password)
         new_user = await UserServices.create_user(body, session)
         return new_user
-    raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.post("/signin", response_model=TokenModel)
 async def signin(body: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
-    try:
-        async with db as session:
-            user = await UserServices.get_user_by_email(body.username, session)
-            if user is None or not auth_service.verify_password(body.password, user.password):
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
-            access_token = await auth_service.create_access_token(data={"sub": user.user_email})
-            refresh_token = await auth_service.create_refresh_token(data={"sub": user.user_email})
-            await UserServices.update_token(user, refresh_token, session)
-            return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
-    except Exception as e:
-        logger.error(f"Login error: {str(e)}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+    async with db as session:
+        user = await UserServices.get_user_by_email(body.username, session)
+        if user is None or not auth_service.verify_password(body.password, user.password):
+            logger.error(f"Login error")
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+        access_token = await auth_service.create_access_token(data={"sub": user.user_email})
+        refresh_token = await auth_service.create_refresh_token(data={"sub": user.user_email})
+        await UserServices.update_token(user, refresh_token, session)
+        return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
 @router.get('/refresh_token', response_model=TokenModel)
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security),
                         db: AsyncSession = Depends(get_db)):
-    try:
-        async with db as session:
-            token = credentials.credentials
-            email = await auth_service.decode_refresh_token(token)
-            user = await UserServices.get_user_by_email(email, session)
-            if user.refresh_token != token:
-                await UserServices.update_token(user, None, session)
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
-
-            access_token = await auth_service.create_access_token(data={"sub": email})
-            refresh_token = await auth_service.create_refresh_token(data={"sub": email})
-            await UserServices.update_token(user, refresh_token, session)
-            return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
-    except Exception as e:
-        logger.error(f"Refresh_token error: {str(e)}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+    async with db as session:
+        token = credentials.credentials
+        email = await auth_service.decode_refresh_token(token)
+        user = await UserServices.get_user_by_email(email, session)
+        if user.refresh_token != token:
+            logger.error(f"Refresh_token error")
+            await UserServices.update_token(user, None, session)
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
+        access_token = await auth_service.create_access_token(data={"sub": email})
+        refresh_token = await auth_service.create_refresh_token(data={"sub": email})
+        await UserServices.update_token(user, refresh_token, session)
+        return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
 
 
 @router.get("/me", response_model=UserDetailResponse)
