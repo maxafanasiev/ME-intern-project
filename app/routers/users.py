@@ -1,19 +1,12 @@
 from typing import Annotated
 
-from fastapi import status, APIRouter, Query, Depends
+from fastapi import APIRouter, Query, Depends
 
 from app.routers.dependencies import user_service
 from app.services.users import UserService
-from app.schemas.user_schemas import User as UserModel, UsersListResponse, SignUpRequestModel, UserDetailResponse, \
-    UserUpdateRequestModel
+from app.schemas.user_schemas import User as UserModel, UsersListResponse, UserDetailResponse, UserUpdateRequestModel
 
 router = APIRouter(tags=["users"])
-
-
-@router.post("/signup", response_model=UserModel, status_code=status.HTTP_201_CREATED)
-async def create_user(body: SignUpRequestModel, user_service: Annotated[UserService, Depends(user_service)]):
-    db_user = await user_service.create_user(body)
-    return db_user
 
 
 @router.get("/{user_id}", response_model=UserDetailResponse)
