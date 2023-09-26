@@ -32,5 +32,5 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
 
 
 @router.get("/me", response_model=UserDetailResponse)
-async def get_current_user(user: UserDetailResponse = Depends(auth_service.get_current_user)):
-    return user
+async def get_current_user(current_user: UserDetailResponse = Depends(auth_service.get_current_user)):
+    return current_user

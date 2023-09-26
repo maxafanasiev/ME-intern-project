@@ -34,13 +34,9 @@ async def get_user_by_id(user_id: int, db: AsyncSession):
         return db_user
 
 
-def _and(param, param1):
-    pass
-
-
-async def update_user_by_id(user_id: int, update_user, db: AsyncSession, current_user: User):
+async def update_user_by_id(update_user, db: AsyncSession, current_user: User):
     async with db as session:
-        stmt = select(User).where(_and(User.user_id == user_id, User.user_id == current_user.user_id))
+        stmt = select(User).where(User.user_id == current_user.user_id)
         result = await session.execute(stmt)
         db_user = result.scalar_one_or_none()
         if db_user is None:
@@ -56,9 +52,9 @@ async def update_user_by_id(user_id: int, update_user, db: AsyncSession, current
         return db_user
 
 
-async def delete_user_by_id(user_id: int, db: AsyncSession, current_user: User):
+async def delete_user_by_id(db: AsyncSession, current_user: User):
     async with db as session:
-        stmt = select(User).where(_and(User.user_id == user_id, User.user_id == current_user.user_id))
+        stmt = select(User).where(User.user_id == current_user.user_id)
         result = await session.execute(stmt)
         db_user = result.scalar_one_or_none()
         if db_user is None:

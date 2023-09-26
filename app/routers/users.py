@@ -18,17 +18,17 @@ async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
     return user
 
 
-@router.put("/{user_id}", response_model=UserDetailResponse)
-async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSession = Depends(get_db),
+@router.put("/", response_model=UserDetailResponse)
+async def update_user(user: UserUpdateRequestModel, db: AsyncSession = Depends(get_db),
                       current_user: User = Depends(auth_service.get_current_user)):
-    db_user = await users_repository.update_user_by_id(user_id, user, db, current_user)
+    db_user = await users_repository.update_user_by_id(user, db, current_user)
     return db_user
 
 
-@router.delete("/{user_id}", response_model=UserModel)
-async def delete_user(user_id: int, db: AsyncSession = Depends(get_db),
+@router.delete("/", response_model=UserModel)
+async def delete_user(db: AsyncSession = Depends(get_db),
                       current_user: User = Depends(auth_service.get_current_user)):
-    db_user = await users_repository.delete_user_by_id(user_id, db, current_user)
+    db_user = await users_repository.delete_user_by_id(db, current_user)
     return db_user
 
 
