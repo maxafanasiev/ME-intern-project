@@ -1,4 +1,8 @@
 from passlib.context import CryptContext
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.models import User
 
 
 class Auth:
@@ -9,6 +13,12 @@ class Auth:
 
     async def get_password_hash(self, password: str):
         return self.pwd_context.hash(password)
+
+    async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
+        stmt = select(User).where(User.user_email == email)
+        result = await db.execute(stmt)
+        db_user = result.scalar_one_or_none()
+        return db_user
 
 
 auth_service = Auth()

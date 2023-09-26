@@ -5,7 +5,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class User(BaseModel):
-    user_id: int
+    id: int
     user_email: str
     user_firstname: str
     user_lastname: str
@@ -40,7 +40,7 @@ class UserUpdateRequestModel(BaseModel):
 
 
 class UserDetailResponse(BaseModel):
-    user_id: int
+    id: int
     user_email: str
     user_firstname: str
     user_lastname: str
