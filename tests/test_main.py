@@ -1,9 +1,4 @@
-import random
-import asyncio
-
 from faker import Faker
-
-from app.services.auth_services import auth_service
 
 fake = Faker()
 

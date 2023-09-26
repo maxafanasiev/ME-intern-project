@@ -17,7 +17,7 @@ async def root():
 async def check_health(postgres_checker: PostgresStatusChecker = Depends(PostgresStatusChecker)):
     postgres_status_result = await postgres_checker.check_status()
 
-    if postgres_status_result is True:
+    if postgres_status_result:
         return {
             "status_code": 200,
             "detail": "ok",
@@ -30,7 +30,7 @@ async def check_health(postgres_checker: PostgresStatusChecker = Depends(Postgre
 async def check_health(redis_checker: RedisStatusChecker = Depends(RedisStatusChecker)):
     redis_status_result = await redis_checker.check_status()
 
-    if redis_status_result is True:
+    if redis_status_result:
         return {
             "status_code": 200,
             "detail": "ok",

@@ -1,6 +1,7 @@
 import redis.asyncio as redisio
 from sqlalchemy.ext.asyncio import create_async_engine
 from app.core.config import RedisConfig, DbConfig
+from app.core.logger import logger
 
 
 class PostgresStatusChecker:
@@ -14,7 +15,8 @@ class PostgresStatusChecker:
                 await connection.begin()
             return True
         except Exception as e:
-            return {"postgres_status": "error", "error_message": str(e)}
+            logger.error(e)
+            return False
 
 
 class RedisStatusChecker:
@@ -27,4 +29,5 @@ class RedisStatusChecker:
             await redis.ping()
             return True
         except Exception as e:
-            return {"redis_status": "error", "error_message": str(e)}
+            logger.error(e)
+            return False
