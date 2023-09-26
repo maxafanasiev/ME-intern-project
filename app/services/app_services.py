@@ -7,13 +7,15 @@ from fastapi import HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import jwt, JWTError
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from app.core.config import JWTConfig, AUTH0Config
 from app.db.db_connect import get_db
-from app.services.users_services import UserServices
 from app.core.logger import logger
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.models import User
 
 
 class Auth:
@@ -89,6 +91,23 @@ class Auth:
 
         raise HTTPException(status_code=401, detail="Invalid token")
 
+    async def create_auth0_user(self, email: str, name: str, password: str, db: AsyncSession) -> User:
+        data = {
+            "user_email": email,
+            "user_firstname": name.split()[0],
+            "user_lastname": name.split()[1],
+            "password": password
+        }
+        new_user = User(**data)
+        db.add(new_user)
+        await db.commit()
+        await db.refresh(new_user)
+        return new_user
+
+    async def update_token(self, user: User, token: str | None, db: AsyncSession) -> None:
+        user.refresh_token = token
+        await db.commit()
+
     async def get_current_user(self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -110,16 +129,22 @@ class Auth:
                 raise credentials_exception
         except JWTError as e:
             raise credentials_exception
-        user = await UserServices.get_user_by_email(email, db)
+        user = await self.get_user_by_email(email, db)
         logger.info(user)
         if user is None and payload['scope'] == 'openid profile email':
             password = await self.get_password_hash(await self.generate_random_password())
-            new_user = await UserServices.create_auth0_user(email,
-                                                            payload['firstname'],
-                                                            password,
-                                                            db)
+            new_user = await self.create_auth0_user(email,
+                                                    payload['firstname'],
+                                                    password,
+                                                    db)
             return new_user
         return user
 
+    async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
+        stmt = select(User).where(User.user_email == email)
+        result = await db.execute(stmt)
+        db_user = result.scalar_one_or_none()
+        return db_user
 
-auth_service = Auth()
+
+app_service = Auth()

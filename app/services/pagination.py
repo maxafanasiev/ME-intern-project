@@ -15,7 +15,7 @@ class Paginator:
     async def paginate(
             self,
             page: int = Query(1, description="Page number, starting from 1", ge=1),
-            size: int = Query(100, description="Number of items per page", le=1000),
+            size: int = Query(10, description="Number of items per page", le=1000),
             db: AsyncSession = Depends(get_db)
     ):
         async with db as session:
