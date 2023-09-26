@@ -31,7 +31,3 @@ class AuthRepository:
             refresh_token = await app_service.create_refresh_token(data={"sub": email})
             await app_service.update_token(user, refresh_token, session)
             return access_token, refresh_token, "bearer"
-
-    async def get_current_user(self, token: str):
-        user = await app_service.get_current_user(token)
-        return user
