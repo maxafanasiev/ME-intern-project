@@ -8,7 +8,7 @@ from app.services.auth_services import auth_service
 from app.services.users_services import UserServices
 
 
-async def login(body: OAuth2PasswordRequestForm , db: AsyncSession):
+async def login(body: OAuth2PasswordRequestForm, db: AsyncSession):
     async with db as session:
         user = await UserServices.get_user_by_email(body.username, session)
         if user is None or not auth_service.verify_password(body.password, user.password):
