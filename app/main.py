@@ -8,6 +8,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from app.db.db_connect import init_models
 from app.routers import healthschecker
 from app.core.config import FastAPIConfig, RedisConfig, origins
+from app.core.logger import logger
 
 fastapi_settings = FastAPIConfig()
 redis_settings = RedisConfig()
@@ -28,6 +29,7 @@ app.include_router(healthschecker.router)
 
 @app.on_event("startup")
 async def startup_event():
+    logger.info("App started")
     await init_models()
     FastAPICache.init(RedisBackend(redis), prefix='app-cache')
 

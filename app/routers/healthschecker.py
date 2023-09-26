@@ -1,20 +1,40 @@
-from fastapi import APIRouter, Depends
-
-from app.db.db_connect import get_db
+from fastapi import APIRouter, Depends, HTTPException
+from app.services.healthchecker_services import PostgresStatusChecker, RedisStatusChecker
 
 router = APIRouter(tags=['healthchecker'])
 
 
 @router.get("/")
 async def root():
-    response_data = {
+    return {
         "status_code": 200,
         "detail": "ok",
         "result": "working"
     }
-    return response_data
 
 
-@router.get("/test-postgres/")
-async def test_db(db=Depends(get_db)):
-    return "postgres work = True" if db else "404"
+@router.get("/db_health")
+async def check_health(postgres_checker: PostgresStatusChecker = Depends(PostgresStatusChecker)):
+    postgres_status_result = await postgres_checker.check_status()
+
+    if postgres_status_result is True:
+        return {
+            "status_code": 200,
+            "detail": "ok",
+            "result": "working"
+        }
+    raise HTTPException(status_code=500, detail="Postgres Connection Error")
+
+
+@router.get("/redis_health")
+async def check_health(redis_checker: RedisStatusChecker = Depends(RedisStatusChecker)):
+    redis_status_result = await redis_checker.check_status()
+
+    if redis_status_result is True:
+        return {
+            "status_code": 200,
+            "detail": "ok",
+            "result": "working"
+        }
+
+    raise HTTPException(status_code=500, detail="Redis Connection Error")

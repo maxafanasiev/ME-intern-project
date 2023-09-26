@@ -1,3 +1,4 @@
+from sqlalchemy import NullPool
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
@@ -5,11 +6,9 @@ from app.core.config import DbConfig
 
 db_settings = DbConfig()
 
-DATABASE_URL = (f"{db_settings.service}://{db_settings.user}:{db_settings.password}"
-                f"@{db_settings.domain}:{db_settings.port}/{db_settings.name}")
-
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(db_settings.url, echo=True, poolclass=NullPool)
 AsyncDBSession = AsyncSession(engine, expire_on_commit=False)
+
 Base = declarative_base()
 
 
