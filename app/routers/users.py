@@ -23,7 +23,7 @@ async def create_user(body: SignUpRequestModel, db: AsyncSession = Depends(get_d
         if exist_user:
             logger.error(f"Error create user")
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
-        body.password = auth_service.get_password_hash(body.password)
+        body.password = await auth_service.get_password_hash(body.password)
         new_user = await UserServices.create_user(body, session)
         return new_user
 
@@ -49,7 +49,7 @@ async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSessi
         if db_user is None:
             logger.error(f"Error updating user")
             raise HTTPException(status_code=404, detail="User not found")
-        db_user.password = auth_service.get_password_hash(db_user.password)
+        db_user.password = await auth_service.get_password_hash(db_user.password)
         db_user.updated_at = datetime.now()
         for field, value in user.model_dump().items():
             if value is not None:
