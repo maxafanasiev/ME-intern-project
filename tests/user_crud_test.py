@@ -76,7 +76,7 @@ def test_update_user(test_client):
         "user_lastname": fake.last_name()[:50],
     }
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = test_client.put(f"/users/{user_id}",headers=headers, json=upgrade_data)
+    response = test_client.put(f"/users/{user_id}", headers=headers, json=upgrade_data)
 
     assert response.status_code == 200
 

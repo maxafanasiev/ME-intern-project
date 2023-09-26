@@ -5,6 +5,7 @@ from app.db.db_connect import get_db
 from app.db.models import User
 from app.schemas.user_schemas import User as UserModel, UsersListResponse, UserDetailResponse, UserUpdateRequestModel
 from app.schemas.validation_schemas import UsersQueryParams
+from app.services.auth_services import auth_service
 from app.services.pagination import Paginator
 from app.repository import users_repository
 
@@ -18,14 +19,16 @@ async def read_user(user_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{user_id}", response_model=UserDetailResponse)
-async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSession = Depends(get_db)):
-    db_user = await users_repository.update_user_by_id(user_id, user, db)
+async def update_user(user_id: int, user: UserUpdateRequestModel, db: AsyncSession = Depends(get_db),
+                      current_user: User = Depends(auth_service.get_current_user)):
+    db_user = await users_repository.update_user_by_id(user_id, user, db, current_user)
     return db_user
 
 
 @router.delete("/{user_id}", response_model=UserModel)
-async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
-    db_user = await users_repository.delete_user_by_id(user_id, db)
+async def delete_user(user_id: int, db: AsyncSession = Depends(get_db),
+                      current_user: User = Depends(auth_service.get_current_user)):
+    db_user = await users_repository.delete_user_by_id(user_id, db, current_user)
     return db_user
 
 
