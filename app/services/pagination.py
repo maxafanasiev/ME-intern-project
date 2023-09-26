@@ -20,6 +20,6 @@ class Paginator:
     ):
         async with db as session:
             offset = (page - 1) * size
-            stmt = select(self.entity).offset(offset).limit(size)
+            stmt = select(self.entity).offset(offset).limit(size).order_by(self.entity.created_at)
             result = await session.execute(stmt)
             return result.scalars().all()
