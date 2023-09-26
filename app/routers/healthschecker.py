@@ -17,7 +17,7 @@ async def root():
 async def check_health(postgres_checker: PostgresStatusChecker = Depends(PostgresStatusChecker)):
     postgres_status_result = await postgres_checker.check_status()
 
-    if postgres_status_result:
+    if postgres_status_result is True:
         return {
             "status_code": 200,
             "detail": "ok",
