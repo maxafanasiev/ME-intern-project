@@ -42,7 +42,7 @@ async def update_user(user: UserUpdateRequestModel,
         if db_user is None:
             logger.error(f"Error updating user")
             raise HTTPException(status_code=404, detail="User not found")
-        db_user.password = auth_service.get_password_hash(db_user.password)
+        db_user.password = await auth_service.get_password_hash(db_user.password)
         db_user.updated_at = datetime.now()
         for field, value in user.model_dump().items():
             if value is not None:

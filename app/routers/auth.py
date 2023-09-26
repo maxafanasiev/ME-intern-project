@@ -20,7 +20,7 @@ async def create_user(body: SignUpRequestModel, db: AsyncSession = Depends(get_d
         if exist_user:
             logger.error(f"Error create user")
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
-        body.password = auth_service.get_password_hash(body.password)
+        body.password = await auth_service.get_password_hash(body.password)
         new_user = await UserServices.create_user(body, session)
         return new_user
 
