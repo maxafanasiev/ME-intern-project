@@ -23,12 +23,12 @@ def test_sign_up(test_client):
     assert response.status_code == 201
 
     user_data = response.json()
-    assert "user_id" in user_data
+    assert "id" in user_data
     assert "user_email" in user_data
     assert "user_firstname" in user_data
     assert "user_lastname" in user_data
 
-    signup_data.update({"user_id": user_data["user_id"]})
+    signup_data.update({"id": user_data["id"]})
 
 
 def test_sign_up_again(test_client):
@@ -38,13 +38,13 @@ def test_sign_up_again(test_client):
 
 
 def test_get_user(test_client):
-    user_id = signup_data["user_id"]
+    user_id = signup_data["id"]
     response = test_client.get(f"/users/{user_id}")
 
     assert response.status_code == 200
 
     user_data = response.json()
-    assert "user_id" in user_data
+    assert "id" in user_data
     assert "user_email" in user_data
     assert "user_firstname" in user_data
     assert "user_lastname" in user_data
@@ -58,7 +58,7 @@ def test_get_user_not_found(test_client):
 
 
 def test_update_user(test_client):
-    user_id = signup_data["user_id"]
+    user_id = signup_data["id"]
     upgrade_data = {
         "user_firstname": fake.first_name()[:50],
         "user_lastname": fake.last_name()[:50],
@@ -89,7 +89,7 @@ def test_get_users(test_client):
 
 
 def test_delete_user(test_client):
-    user_id = signup_data["user_id"]
+    user_id = signup_data["id"]
     response = test_client.delete(f"/users/{user_id}")
 
     assert response.status_code == 200

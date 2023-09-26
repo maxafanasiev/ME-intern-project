@@ -14,6 +14,10 @@ from app.core.config import JWTConfig, AUTH0Config
 from app.db.db_connect import get_db
 from app.services.users_services import UserServices
 from app.core.logger import logger
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.db.models import User
 
 
 class Auth:
@@ -120,6 +124,11 @@ class Auth:
                                                             db)
             return new_user
         return user
+    async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
+        stmt = select(User).where(User.user_email == email)
+        result = await db.execute(stmt)
+        db_user = result.scalar_one_or_none()
+        return db_user
 
 
 auth_service = Auth()
