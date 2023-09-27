@@ -1,8 +1,14 @@
-"""id
+"""tablename
 
+<<<<<<<< HEAD:alembic/versions/e9ea2ee3b315_id.py
 Revision ID: e9ea2ee3b315
 Revises: 
 Create Date: 2023-09-26 18:39:43.403367
+========
+Revision ID: b0f79fe8f4c9
+Revises: 
+Create Date: 2023-09-27 18:20:04.263838
+>>>>>>>> 8b2f1a511dec6252f76914ce28d86db36da0896b:alembic/versions/b0f79fe8f4c9_tablename.py
 
 """
 from typing import Sequence, Union
@@ -12,7 +18,11 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
+<<<<<<<< HEAD:alembic/versions/e9ea2ee3b315_id.py
 revision: str = 'e9ea2ee3b315'
+========
+revision: str = 'b0f79fe8f4c9'
+>>>>>>>> 8b2f1a511dec6252f76914ce28d86db36da0896b:alembic/versions/b0f79fe8f4c9_tablename.py
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
