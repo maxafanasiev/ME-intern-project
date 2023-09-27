@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from fastapi import HTTPException
-from typing import List
+from typing import List, Dict
 
 from sqlalchemy import insert, update, select
 
@@ -50,12 +50,13 @@ class SQLAlchemyRepository(AbstractRepository):
                 raise HTTPException(status_code=404, detail="Entity not found")
             return db_user
 
-    async def get_all(self, page: int, size: int) -> List[model]:
+    async def get_all(self, page: int, size: int) -> Dict:
         async for session in get_db():
             offset = (page - 1) * size
             query = select(self.model).offset(offset).limit(size)
             res = await session.execute(query)
-            return res.scalars().all()
+            name = f"{self.model.__name__.lower()}s"
+            return{name:  res.scalars().all()}
 
     async def update_one(self, model_id: int, data: dict) -> model:
         async for session in get_db():

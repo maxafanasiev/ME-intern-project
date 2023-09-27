@@ -37,4 +37,4 @@ async def read_users(
         page: int = Query(1, description="Page number, starting from 1", ge=1),
         size: int = Query(10, description="Number of items per page", le=1000)
 ):
-    return {"users": await user_service.get_all_users(page, size)}
+    return await user_service.get_all_users(page, size)
