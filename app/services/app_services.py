@@ -37,7 +37,7 @@ class Auth:
         result = await db.execute(query)
         return result.scalar_one_or_none()
 
-    async def get_user_by_id(self, model_id: int, db: AsyncSession) -> User:
+    async def get_user_by_id(self, model_id: int, db: AsyncSession) -> Optional[User]:
         query = select(User).where(User.id == model_id)
         result = await db.execute(query)
         db_user = result.scalar_one_or_none()
