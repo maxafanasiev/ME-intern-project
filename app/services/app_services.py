@@ -26,6 +26,17 @@ class Auth:
     ALGORITHM = jwt_settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/signin")
 
+    async def verify_password(self, plain_password, hashed_password):
+        return self.pwd_context.verify(plain_password, hashed_password)
+
+    async def get_password_hash(self, password: str):
+        return self.pwd_context.hash(password)
+
+    async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
+        query = select(User).where(User.user_email == email)
+        result = await db.execute(query)
+        return result.scalar_one_or_none()
+
     async def get_user_by_id(self, model_id: int, db: AsyncSession) -> User:
         query = select(User).where(User.id == model_id)
         result = await db.execute(query)

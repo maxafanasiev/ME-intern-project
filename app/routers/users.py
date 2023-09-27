@@ -34,4 +34,4 @@ async def delete_user(user_id: int, user_service: Annotated[UserService, Depends
 async def read_users(
         user_service: Annotated[UserService, Depends(user_service)], params: PaginationQueryParams = Depends()
 ):
-    return {"users": await user_service.get_all_users(params.page, params.size)}
+    return await user_service.get_all_users(params.page, params.size)
