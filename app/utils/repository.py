@@ -35,15 +35,15 @@ class SQLAlchemyRepository(AbstractRepository):
 
     async def add_one(self, data) -> model:
         async for session in get_db():
-            stmt = insert(self.model).values(**data).returning(self.model)
-            res = await session.execute(stmt)
+            query = insert(self.model).values(**data).returning(self.model)
+            res = await session.execute(query)
             await session.commit()
             return res.scalar_one()
 
     async def get_one(self, model_id: int) -> model:
         async for session in get_db():
-            stmt = select(self.model).where(self.model.id == model_id)
-            result = await session.execute(stmt)
+            query = select(self.model).where(self.model.id == model_id)
+            result = await session.execute(query)
             db_user = result.scalar_one_or_none()
             if db_user is None:
                 logger.error(f"Error get entity by id")
@@ -53,26 +53,26 @@ class SQLAlchemyRepository(AbstractRepository):
     async def get_all(self, page: int, size: int) -> List[model]:
         async for session in get_db():
             offset = (page - 1) * size
-            stmt = select(self.model).offset(offset).limit(size)
-            res = await session.execute(stmt)
+            query = select(self.model).offset(offset).limit(size)
+            res = await session.execute(query)
             return res.scalars().all()
 
     async def update_one(self, model_id: int, data: dict) -> model:
         async for session in get_db():
-            stmt = (
+            query = (
                 update(self.model)
                 .where(self.model.id == model_id)
                 .values(**data)
                 .returning(self.model)
             )
-            res = await session.execute(stmt)
+            res = await session.execute(query)
             await session.commit()
             return res.scalar_one()
 
     async def delete_one(self, model_id: int) -> model:
         async for session in get_db():
-            stmt = select(self.model).where(self.model.id == model_id)
-            result = await session.execute(stmt)
+            query = select(self.model).where(self.model.id == model_id)
+            result = await session.execute(query)
             db_user = result.scalar_one_or_none()
             if db_user is None:
                 logger.error(f"Error delete entity")

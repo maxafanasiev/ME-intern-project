@@ -16,8 +16,7 @@ security = HTTPBearer()
 
 @router.post("/signup", response_model=UserDetailResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(body: SignUpRequestModel, user_service: Annotated[UserService, Depends(user_service)]):
-    db_user = await user_service.create_user(body)
-    return db_user
+    return await user_service.create_user(body)
 
 
 @router.post("/signin", response_model=TokenModel)

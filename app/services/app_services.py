@@ -26,6 +26,15 @@ class Auth:
     ALGORITHM = jwt_settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/signin")
 
+    async def get_user_by_id(self, model_id: int, db: AsyncSession) -> User:
+        query = select(User).where(User.id == model_id)
+        result = await db.execute(query)
+        db_user = result.scalar_one_or_none()
+        if db_user is None:
+            logger.error(f"Error get user by id")
+            raise HTTPException(status_code=404, detail="User not found")
+        return db_user
+
     async def generate_random_password(self, length=12):
         characters = string.ascii_letters + string.digits + string.punctuation
         password = ''.join(random.choice(characters) for _ in range(length))
