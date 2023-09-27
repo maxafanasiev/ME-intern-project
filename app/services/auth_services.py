@@ -5,7 +5,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logger import logger
-from app.db.db_connect import get_db
 from app.db.models import User
 
 
