@@ -1,6 +1,3 @@
-from fastapi import Depends
-
-from app.services.app_services import app_service
 from app.utils.repository import AbstractRepository
 from app.schemas.user_schemas import SignUpRequestModel, UserUpdateRequestModel, User, UsersListResponse, \
     UserDetailResponse
