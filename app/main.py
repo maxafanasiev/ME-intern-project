@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache.backends.redis import RedisBackend
 
 from app.db.db_connect import init_models
-from app.routers import healthschecker
+from app.routers import healthschecker, users
 from app.core.config import FastAPIConfig, RedisConfig, origins
 from app.core.logger import logger
 
@@ -25,12 +25,13 @@ app.add_middleware(
 )
 
 app.include_router(healthschecker.router)
+app.include_router(users.router, prefix='/users')
 
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("App started")
     await init_models()
+    logger.info("App started")
     FastAPICache.init(RedisBackend(redis), prefix='app-cache')
 
 

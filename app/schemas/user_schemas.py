@@ -1,12 +1,14 @@
+from datetime import datetime
 from typing import Optional, List
 
-from pydantic import BaseModel, EmailStr, SecretStr, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class User(BaseModel):
-    user_email: EmailStr
-    user_firstname: Optional[str] = None
-    user_lastname: Optional[str] = None
+    id: int
+    user_email: str
+    user_firstname: str
+    user_lastname: str
 
 
 class SingInRequestModel(BaseModel):
@@ -15,7 +17,7 @@ class SingInRequestModel(BaseModel):
 
 
 class SignUpRequestModel(BaseModel):
-    user_email: str
+    user_email: EmailStr
     user_firstname: Optional[str] = None
     user_lastname: Optional[str] = None
     user_status: Optional[str] = None
@@ -27,22 +29,18 @@ class SignUpRequestModel(BaseModel):
 
 
 class UserUpdateRequestModel(BaseModel):
-    user_firstname: Optional[str] = Field(min_length=1, max_length=50)
-    user_lastname: Optional[str] = Field(min_length=1, max_length=50)
-    user_status: Optional[str] = Field(min_length=1, max_length=50)
-    user_city: Optional[str] = Field(min_length=1, max_length=50)
-    user_phone: Optional[str] = Field(min_length=1, max_length=50)
+    user_firstname: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_lastname: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_status: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_city: Optional[str] = Field(min_length=1, max_length=50, default=None)
+    user_phone: Optional[str] = Field(min_length=1, max_length=50, default=None)
     user_links: Optional[List[str]] = None
     user_avatar: Optional[str] = None
-    password: Optional[SecretStr] = Field(min_length=8, max_length=50)
-
-
-class UsersListResponse(BaseModel):
-    users: List[User]
+    password: Optional[str] = Field(min_length=8, max_length=50, default=None)
 
 
 class UserDetailResponse(BaseModel):
-    user_id: int
+    id: int
     user_email: str
     user_firstname: str
     user_lastname: str
@@ -52,3 +50,9 @@ class UserDetailResponse(BaseModel):
     user_links: List[str]
     user_avatar: str
     is_superuser: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+class UsersListResponse(BaseModel):
+    users: List[User]

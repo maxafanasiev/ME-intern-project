@@ -7,7 +7,7 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
     user_email = Column(String(255), unique=True, nullable=False)
     user_firstname = Column(String(100), nullable=True)
     user_lastname = Column(String(100), nullable=True)
@@ -18,5 +18,5 @@ class User(Base):
     user_avatar = Column(String(255), nullable=True)
     password = Column(String(255), nullable=False)
     is_superuser = Column(Boolean(), default=False)
-    created_at = Column('crated_at', DateTime, default=func.now())
+    created_at = Column('created_at', DateTime, default=func.now())
     updated_at = Column('updated_at', DateTime, default=func.now())
