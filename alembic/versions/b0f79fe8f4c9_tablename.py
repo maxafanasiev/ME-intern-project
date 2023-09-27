@@ -1,4 +1,4 @@
-"""id
+"""tablename
 
 Revision ID: e9ea2ee3b315
 Revises: 
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'e9ea2ee3b315'
+revision: str = 'b0f79fe8f4c9'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
