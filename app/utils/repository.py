@@ -55,7 +55,7 @@ class SQLAlchemyRepository(AbstractRepository):
             offset = (page - 1) * size
             query = select(self.model).offset(offset).limit(size)
             res = await session.execute(query)
-            name = f"{self.model.__tablename__}"
+            name = self.model.__tablename__
             return{name:  res.scalars().all()}
 
     async def update_one(self, model_id: int, data: dict) -> model:
