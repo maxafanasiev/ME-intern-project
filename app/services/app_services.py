@@ -18,8 +18,8 @@ class Auth:
         return self.pwd_context.hash(password)
 
     async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
-        stmt = select(User).where(User.user_email == email)
-        result = await db.execute(stmt)
+        query = select(User).where(User.user_email == email)
+        result = await db.execute(query)
         db_user = result.scalar_one_or_none()
         return db_user
 
