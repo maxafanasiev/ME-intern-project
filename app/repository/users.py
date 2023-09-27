@@ -20,24 +20,22 @@ class UsersRepository(SQLAlchemyRepository):
                 logger.error(f"Error create user")
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
             data.password = await app_service.get_password_hash(data.password)
-            stmt = insert(self.model).values(**data.model_dump()).returning(self.model)
-            res = await session.execute(stmt)
+            query = insert(self.model).values(**data.model_dump()).returning(self.model)
+            res = await session.execute(query)
             await session.commit()
             return res.scalar_one()
 
     async def update_one(self, model_id: int, data) -> model:
         async for session in get_db():
-            stmt = select(User).where(User.id == model_id)
-            result = await session.execute(stmt)
-            db_user = result.scalar_one_or_none()
+            db_user = await app_service.get_user_by_id(model_id, session)
             if db_user is None:
                 logger.error(f"Error updating user")
                 raise HTTPException(status_code=404, detail="User not found")
-            db_user.password = await app_service.get_password_hash(db_user.password)
-            db_user.updated_at = datetime.now()
             for field, value in data.model_dump().items():
                 if value is not None:
                     setattr(db_user, field, value)
+            db_user.password = await app_service.get_password_hash(db_user.password)
+            db_user.updated_at = datetime.now()
             await session.commit()
             await session.refresh(db_user)
             return db_user
