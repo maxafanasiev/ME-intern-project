@@ -19,13 +19,15 @@ async def read_user(user_id: int, user_service: Annotated[UserService, Depends(u
 
 @router.put("/{user_id}", response_model=UserDetailResponse)
 async def update_user(user_id: int, user: UserUpdateRequestModel,
-                      user_service: Annotated[UserService, Depends(user_service)]):
-    return await user_service.update_user(user_id, user)
+                      user_service: Annotated[UserService, Depends(user_service)],
+                      current_user: User = Depends(app_service.get_current_user)):
+    return await user_service.update_user(user_id, user, current_user)
 
 
 @router.delete("/{user_id}", response_model=UserModel)
-async def delete_user(user_id: int, user_service: Annotated[UserService, Depends(user_service)]):
-    return await user_service.delete_user(user_id)
+async def delete_user(user_id: int, user_service: Annotated[UserService, Depends(user_service)],
+                      current_user: User = Depends(app_service.get_current_user)):
+    return await user_service.delete_user(user_id, current_user)
 
 
 @router.get("/", response_model=UsersListResponse)

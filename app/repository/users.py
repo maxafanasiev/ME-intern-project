@@ -27,27 +27,31 @@ class UsersRepository(SQLAlchemyRepository):
 
     async def update_one(self, model_id: int, data, current_user) -> model:
         async for session in get_db():
-            db_user = await app_service.get_user_by_id(model_id, session)
-            if db_user is None:
-                logger.error(f"Error updating user")
-                raise HTTPException(status_code=404, detail="User not found")
-            for field, value in data.model_dump().items():
-                if value is not None:
-                    setattr(db_user, field, value)
-            db_user.password = await app_service.get_password_hash(db_user.password)
-            db_user.updated_at = datetime.now()
-            await session.commit()
-            await session.refresh(db_user)
-            return db_user
+            if current_user.id == model_id:
+                db_user = await app_service.get_user_by_id(model_id, session)
+                if db_user is None:
+                    logger.error(f"Error updating user")
+                    raise HTTPException(status_code=404, detail="User not found")
+                for field, value in data.model_dump().items():
+                    if value is not None:
+                        setattr(db_user, field, value)
+                db_user.password = await app_service.get_password_hash(db_user.password)
+                db_user.updated_at = datetime.now()
+                await session.commit()
+                await session.refresh(db_user)
+                return db_user
+            raise HTTPException(status_code=401, detail="Нou can only update your own user")
 
     async def delete_one(self, model_id: int, current_user) -> model:
         async for session in get_db():
-            stmt = select(User).where(and_(User.id == model_id, User.id == current_user.id))
-            result = await session.execute(stmt)
-            db_user = result.scalar_one_or_none()
-            if db_user is None:
-                logger.error(f"Error deleting user")
-                raise HTTPException(status_code=404, detail="User not found")
-            await session.delete(db_user)
-            await session.commit()
-            return db_user
+            if current_user.id == model_id:
+                query = select(User).where(and_(User.id == model_id, User.id == current_user.id))
+                result = await session.execute(query)
+                db_user = result.scalar_one_or_none()
+                if db_user is None:
+                    logger.error(f"Error deleting user")
+                    raise HTTPException(status_code=404, detail="User not found")
+                await session.delete(db_user)
+                await session.commit()
+                return db_user
+            raise HTTPException(status_code=401, detail="Нou can only delete your own user")

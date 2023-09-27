@@ -137,9 +137,9 @@ class Auth:
             else:
                 raise credentials_exception
         except JWTError as e:
+            logger.info(e)
             raise credentials_exception
         user = await self.get_user_by_email(email, db)
-        logger.info(user)
         if user is None and payload['scope'] == 'openid profile email':
             password = await self.get_password_hash(await self.generate_random_password())
             new_user = await self.create_auth0_user(email,
@@ -150,8 +150,8 @@ class Auth:
         return user
 
     async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
-        stmt = select(User).where(User.user_email == email)
-        result = await db.execute(stmt)
+        query = select(User).where(User.user_email == email)
+        result = await db.execute(query)
         db_user = result.scalar_one_or_none()
         return db_user
 
