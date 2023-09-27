@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import insert, select
+from sqlalchemy import insert
 
 from app.core.logger import logger
 from app.db.db_connect import get_db
