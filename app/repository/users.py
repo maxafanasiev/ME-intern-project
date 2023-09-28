@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from fastapi import HTTPException, status
-from sqlalchemy import insert
+from sqlalchemy import insert, update, select
 
 from app.core.logger import logger
 from app.db.db_connect import get_db
@@ -27,7 +27,9 @@ class UsersRepository(SQLAlchemyRepository):
 
     async def update_one(self, model_id: int, data) -> model:
         async for session in get_db():
-            db_user = await auth.get_user_by_id(model_id, session)
+            query = select(User).where(User.id == model_id)
+            result = await session.execute(query)
+            db_user = result.scalar_one_or_none()
             if db_user is None:
                 logger.error(f"Error updating user")
                 raise HTTPException(status_code=404, detail="User not found")
