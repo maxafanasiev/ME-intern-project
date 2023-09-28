@@ -153,4 +153,4 @@ class Auth:
         return user
 
 
-app_service = Auth()
+auth = Auth()

@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredent
 
 from app.schemas.token_schemas import TokenModel
 from app.schemas.user_schemas import UserDetailResponse
-from app.services.auth_services import app_service
+from app.services.auth_services import auth
 from app.services.auth import AuthService
 from app.routers.dependencies import auth_service
 
@@ -28,5 +28,5 @@ async def refresh_token(auth_service: Annotated[AuthService, Depends(auth_servic
 
 
 @router.get("/me", response_model=UserDetailResponse)
-async def get_current_user(user=Depends(app_service.get_current_user)):
+async def get_current_user(user=Depends(auth.get_current_user)):
     return user

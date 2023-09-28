@@ -18,7 +18,7 @@ signup_data = {
 
 
 def test_sign_up(test_client):
-    response = test_client.post("/auth/signup", json=signup_data)
+    response = test_client.post("/users/signup", json=signup_data)
 
     assert response.status_code == 201
 
@@ -32,7 +32,7 @@ def test_sign_up(test_client):
 
 
 def test_sign_up_again(test_client):
-    response = test_client.post("/auth/signup", json=signup_data)
+    response = test_client.post("/users/signup", json=signup_data)
 
     assert response.status_code == 409
 
