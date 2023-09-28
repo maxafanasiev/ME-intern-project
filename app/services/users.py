@@ -1,6 +1,7 @@
 from app.utils.repository import AbstractRepository
 from app.schemas.user_schemas import SignUpRequestModel, UserUpdateRequestModel, User, UsersListResponse, \
     UserDetailResponse
+from app.db.models import User as UserModel
 
 
 class UserService:
@@ -17,8 +18,8 @@ class UserService:
         return await self.user_repo.get_all(page, size)
 
     async def update_user(self, user_id: int, user: UserUpdateRequestModel,
-                          current_user: User) -> UserDetailResponse:
+                          current_user: UserModel) -> UserDetailResponse:
         return await self.user_repo.update_one(user_id, user, current_user)
 
-    async def delete_user(self, user_id: int, current_user: User) -> User:
+    async def delete_user(self, user_id: int, current_user: UserModel) -> User:
         return await self.user_repo.delete_one(user_id, current_user)
