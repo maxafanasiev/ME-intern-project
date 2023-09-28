@@ -1,22 +1,16 @@
 from typing import Annotated
 
-from fastapi import Depends, status, APIRouter, Security
+from fastapi import Depends, APIRouter, Security
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
 
 from app.schemas.token_schemas import TokenModel
-from app.schemas.user_schemas import SignUpRequestModel, UserDetailResponse
-from app.services.app_services import app_service
+from app.schemas.user_schemas import UserDetailResponse
+from app.services.auth_services import app_service
 from app.services.auth import AuthService
-from app.services.users import UserService
-from app.routers.dependencies import user_service, auth_service
+from app.routers.dependencies import auth_service
 
 router = APIRouter(tags=["auth"])
 security = HTTPBearer()
-
-
-@router.post("/signup", response_model=UserDetailResponse, status_code=status.HTTP_201_CREATED)
-async def create_user(body: SignUpRequestModel, user_service: Annotated[UserService, Depends(user_service)]):
-    return await user_service.create_user(body)
 
 
 @router.post("/signin", response_model=TokenModel)

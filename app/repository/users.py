@@ -6,7 +6,7 @@ from sqlalchemy import insert
 from app.core.logger import logger
 from app.db.db_connect import get_db
 from app.db.models import User
-from app.services.app_services import app_service
+from app.services.auth_services import app_service
 from app.utils.repository import SQLAlchemyRepository
 
 

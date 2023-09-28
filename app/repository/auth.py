@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredent
 
 from app.core.logger import logger
 from app.db.db_connect import get_db
-from app.services.app_services import app_service
+from app.services.auth_services import app_service
 
 
 class AuthRepository:
