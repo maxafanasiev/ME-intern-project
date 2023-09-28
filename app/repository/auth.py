@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials
 
@@ -7,7 +9,7 @@ from app.services.app_services import app_service
 
 
 class AuthRepository:
-    async def login(self, body: OAuth2PasswordRequestForm):
+    async def login(self, body: OAuth2PasswordRequestForm) -> Tuple:
         async for session in get_db():
             user = await app_service.get_user_by_email(body.username, session)
             if user is None or not app_service.verify_password(body.password, user.password):
@@ -18,7 +20,7 @@ class AuthRepository:
             await app_service.update_token(user, refresh_token, session)
             return access_token, refresh_token, "bearer"
 
-    async def refresh_token(self, credentials: HTTPAuthorizationCredentials):
+    async def refresh_token(self, credentials: HTTPAuthorizationCredentials) -> Tuple:
         async for session in get_db():
             token = credentials.credentials
             email = await app_service.decode_refresh_token(token)
