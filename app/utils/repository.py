@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
+
 from fastapi import HTTPException
 from typing import List, Dict
 
@@ -67,6 +69,7 @@ class SQLAlchemyRepository(AbstractRepository):
                 .returning(self.model)
             )
             res = await session.execute(query)
+            res.updated_at = datetime.now()
             await session.commit()
             return res.scalar_one()
 
