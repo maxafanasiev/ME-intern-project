@@ -107,17 +107,25 @@ class Auth:
         raise HTTPException(status_code=401, detail="Invalid token")
 
     async def create_auth0_user(self, email: str, name: str, password: str, db: AsyncSession) -> User:
-        data = {
-            "user_email": email,
-            "user_firstname": name.split()[0],
-            "user_lastname": name.split()[1],
-            "password": password
-        }
+        try:
+            data = {
+                "user_email": email,
+                "user_firstname": name.split()[0],
+                "user_lastname": name.split()[1],
+                "password": password
+            }
+        except Exception as e:
+            logger.error(e)
+            data = {
+                "user_email": email,
+                "password": password
+            }
         new_user = User(**data)
         db.add(new_user)
         await db.commit()
         await db.refresh(new_user)
         return new_user
+
 
     async def update_token(self, user: User, token: str | None, db: AsyncSession) -> None:
         user.refresh_token = token
