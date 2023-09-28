@@ -148,9 +148,9 @@ class Auth:
             else:
                 raise credentials_exception
         except JWTError as e:
+            logger.error(e)
             raise credentials_exception
         user = await self.get_user_by_email(email, db)
-        logger.info(user)
         if user is None and payload['scope'] == 'openid profile email':
             password = await self.get_password_hash(await self.generate_random_password())
             new_user = await self.create_auth0_user(email,
@@ -158,6 +158,8 @@ class Auth:
                                                     password,
                                                     db)
             return new_user
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid credentials')
         return user
 
     async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
