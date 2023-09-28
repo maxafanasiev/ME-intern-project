@@ -37,7 +37,8 @@ class SQLAlchemyRepository(AbstractRepository):
 
     async def add_one(self, data) -> model:
         async for session in get_db():
-            query = insert(self.model).values(**data).returning(self.model)
+            data_dict = dict(data)
+            query = insert(self.model).values(**data_dict).returning(self.model)
             res = await session.execute(query)
             await session.commit()
             return res.scalar_one()
@@ -57,8 +58,8 @@ class SQLAlchemyRepository(AbstractRepository):
             offset = (page - 1) * size
             query = select(self.model).offset(offset).limit(size)
             res = await session.execute(query)
-            name = self.model.__tablename__
-            return{name:  res.scalars().all()}
+            table_name = self.model.__tablename__
+            return{table_name: res.scalars().all()}
 
     async def update_one(self, model_id: int, data: dict) -> model:
         async for session in get_db():
