@@ -70,24 +70,22 @@ def test_get_user_not_found(test_client):
 
 
 def test_update_user(test_client):
-    user_id = signup_data["id"]
     upgrade_data = {
         "user_firstname": fake.first_name()[:50],
         "user_lastname": fake.last_name()[:50],
     }
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = test_client.put(f"/users/{user_id}", headers=headers, json=upgrade_data)
+    response = test_client.put(f"/users/update", headers=headers, json=upgrade_data)
 
     assert response.status_code == 200
 
 
 def test_update_user_not_authorisation(test_client):
-    user_id = signup_data["id"]
     upgrade_data = {
         "user_firstname": fake.first_name()[:50],
         "user_lastname": fake.last_name()[:50],
     }
-    response = test_client.put(f"/users/{user_id}", json=upgrade_data)
+    response = test_client.put(f"/users/update", json=upgrade_data)
 
     assert response.status_code == 401
 
@@ -102,15 +100,13 @@ def test_get_users(test_client):
 
 
 def test_delete_user(test_client):
-    user_id = signup_data["id"]
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = test_client.delete(f"/users/{user_id}", headers=headers)
+    response = test_client.delete(f"/users/delete", headers=headers)
 
     assert response.status_code == 200
 
 
 def test_delete_user_not_authorisation(test_client):
-    user_id = signup_data["id"]
-    response = test_client.delete(f"/users/{user_id}")
+    response = test_client.delete(f"/users/delete")
 
     assert response.status_code == 401
