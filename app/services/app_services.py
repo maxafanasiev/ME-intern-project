@@ -16,6 +16,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import User
+from app.services.exceptions import CredentialException
 
 
 class Auth:
@@ -129,35 +130,31 @@ class Auth:
         await db.commit()
 
     async def get_current_user(self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
         try:
             payload = await self.decode_and_verify_access_token(token)
             if payload['scope'] == 'access_token':
                 email = payload["sub"]
                 if email is None:
-                    raise credentials_exception
+                    raise CredentialException
             elif payload['scope'] == 'openid profile email':
                 email = payload["email"]
                 if email is None:
-                    raise credentials_exception
+                    raise CredentialException
             else:
-                raise credentials_exception
+                raise CredentialException
         except JWTError as e:
-            logger.info(e)
-            raise credentials_exception
+            logger.error(e)
+            raise CredentialException
         user = await self.get_user_by_email(email, db)
         if user is None and payload['scope'] == 'openid profile email':
             password = await self.get_password_hash(await self.generate_random_password())
             new_user = await self.create_auth0_user(email,
-                                                    payload['firstname'],
+                                                    payload['name'],
                                                     password,
                                                     db)
             return new_user
+        if user is None:
+            raise CredentialException(detail="Invalid credentials.")
         return user
 
     async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
