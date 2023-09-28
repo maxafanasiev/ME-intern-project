@@ -1,6 +1,6 @@
 import string
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Dict
 import random
 
 from fastapi import HTTPException, Depends
@@ -27,13 +27,7 @@ class Auth:
     ALGORITHM = jwt_settings.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/signin")
 
-    async def verify_password(self, plain_password, hashed_password):
-        return self.pwd_context.verify(plain_password, hashed_password)
-
-    async def get_password_hash(self, password: str):
-        return self.pwd_context.hash(password)
-
-    async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
+    async def get_user_by_email(self, email: str, db: AsyncSession) -> Optional[User]:
         query = select(User).where(User.user_email == email)
         result = await db.execute(query)
         return result.scalar_one_or_none()
@@ -47,18 +41,18 @@ class Auth:
             raise HTTPException(status_code=404, detail="User not found")
         return db_user
 
-    async def generate_random_password(self, length=12):
+    async def generate_random_password(self, length=12) -> str:
         characters = string.ascii_letters + string.digits + string.punctuation
         password = ''.join(random.choice(characters) for _ in range(length))
         return password
 
-    async def verify_password(self, plain_password, hashed_password):
+    async def verify_password(self, plain_password, hashed_password) -> bool:
         return self.pwd_context.verify(plain_password, hashed_password)
 
-    async def get_password_hash(self, password: str):
+    async def get_password_hash(self, password: str) -> str:
         return self.pwd_context.hash(password)
 
-    async def create_access_token(self, data: dict, expires_delta: Optional[float] = None):
+    async def create_access_token(self, data: dict, expires_delta: Optional[float] = None) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
@@ -68,7 +62,7 @@ class Auth:
         encoded_access_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return encoded_access_token
 
-    async def create_refresh_token(self, data: dict, expires_delta: Optional[float] = None):
+    async def create_refresh_token(self, data: dict, expires_delta: Optional[float] = None) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + timedelta(seconds=expires_delta)
@@ -78,7 +72,7 @@ class Auth:
         encoded_refresh_token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
         return encoded_refresh_token
 
-    async def decode_refresh_token(self, refresh_token: str):
+    async def decode_refresh_token(self, refresh_token: str) -> Optional[str]:
         try:
             payload = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload['scope'] == 'refresh_token':
@@ -88,7 +82,7 @@ class Auth:
         except JWTError:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
 
-    async def decode_and_verify_access_token(self, token: str):
+    async def decode_and_verify_access_token(self, token: str) -> Optional[Dict]:
         try:
             auth0_decoded = jwt.decode(
                 token,
@@ -129,7 +123,8 @@ class Auth:
         user.refresh_token = token
         await db.commit()
 
-    async def get_current_user(self, token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+    async def get_current_user(self, token: str = Depends(oauth2_scheme),
+                               db: AsyncSession = Depends(get_db)) -> Optional[User]:
         try:
             payload = await self.decode_and_verify_access_token(token)
             if payload['scope'] == 'access_token':
@@ -156,12 +151,6 @@ class Auth:
         if user is None:
             raise CredentialException(detail="Invalid credentials.")
         return user
-
-    async def get_user_by_email(self, email: str, db: AsyncSession) -> User:
-        stmt = select(User).where(User.user_email == email)
-        result = await db.execute(stmt)
-        db_user = result.scalar_one_or_none()
-        return db_user
 
 
 app_service = Auth()
