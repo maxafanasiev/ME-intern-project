@@ -154,7 +154,7 @@ class Auth:
         if user is None and payload['scope'] == 'openid profile email':
             password = await self.get_password_hash(await self.generate_random_password())
             new_user = await self.create_auth0_user(email,
-                                                    payload['firstname'],
+                                                    payload['name'],
                                                     password,
                                                     db)
             return new_user
