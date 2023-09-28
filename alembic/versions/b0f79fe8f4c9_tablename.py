@@ -1,8 +1,8 @@
 """tablename
 
-Revision ID: b0f79fe8f4c9
+Revision ID: e9ea2ee3b315
 Revises: 
-Create Date: 2023-09-27 18:20:04.263838
+Create Date: 2023-09-26 18:39:43.403367
 
 """
 from typing import Sequence, Union
@@ -34,6 +34,7 @@ def upgrade() -> None:
     sa.Column('is_superuser', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('refresh_token', sa.String(length=255), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('user_email')
     )
