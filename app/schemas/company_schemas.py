@@ -10,6 +10,7 @@ class Company(BaseModel):
     id: int
     company_name: str
     company_title: Optional[str] = None
+    owner_id: int
 
 
 class CreateCompanyRequestModel(BaseModel):
@@ -46,6 +47,7 @@ class CompanyDetailResponse(BaseModel):
     is_visible: bool
     created_at: datetime
     updated_at: datetime
+    owner_id: int
 
 
 class CompanyListResponse(BaseModel):
