@@ -30,7 +30,6 @@ class SignUpRequestModel(BaseModel):
 
 
 class UserUpdateRequestModel(BaseModel):
-    email: Optional[str] = None
     user_firstname: Optional[str] = Field(min_length=1, max_length=50, default=None)
     user_lastname: Optional[str] = Field(min_length=1, max_length=50, default=None)
     user_status: Optional[str] = Field(min_length=1, max_length=50, default=None)
@@ -40,9 +39,9 @@ class UserUpdateRequestModel(BaseModel):
     user_avatar: Optional[str] = None
     password: Optional[str] = Field(min_length=8, max_length=50, default=None)
 
-    @validator("email")
+    @validator("user_email")
     def prevent_email_change(self, value, values):
-        if value is not None and "email" in values:
+        if value is not None and value in values:
             raise ValueError("changing email is prohibited")
         return value
 

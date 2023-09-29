@@ -109,11 +109,11 @@ def test_get_users(test_client):
     assert len(user_list) > 0
 
 
-# def test_delete_user(test_client):
-#     headers = {"Authorization": f"Bearer {access_token}"}
-#     response = test_client.delete(f"/users/delete", headers=headers)
-#
-#     assert response.status_code == 200
+def test_delete_user(test_client):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = test_client.delete(f"/users/delete", headers=headers)
+
+    assert response.status_code == 200
 
 
 def test_delete_user_not_authorisation(test_client):
