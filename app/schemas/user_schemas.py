@@ -41,7 +41,7 @@ class UserUpdateRequestModel(BaseModel):
 
     @validator("user_email")
     def prevent_email_change(self, value, values):
-        if value is not None and value in values:
+        if value is not None and "user_email" in values:
             raise ValueError("changing email is prohibited")
         return value
 
