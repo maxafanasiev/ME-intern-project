@@ -82,12 +82,12 @@ def test_update_user(test_client):
 
 def test_update_user_email(test_client):
     upgrade_data = {
-        "email": fake.email()
+        "user_email": fake.email()
     }
     headers = {"Authorization": f"Bearer {access_token}"}
     response = test_client.put(f"/users/update", headers=headers, json=upgrade_data)
 
-    assert response.status_code == 200
+    assert response.status_code == 422
 
 
 def test_update_user_not_authorisation(test_client):
