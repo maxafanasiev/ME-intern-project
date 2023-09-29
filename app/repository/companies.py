@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from fastapi import HTTPException, status
 from sqlalchemy import insert, select, and_
@@ -13,7 +14,7 @@ from app.utils.repository import SQLAlchemyRepository
 class CompanyRepository(SQLAlchemyRepository):
     model = Company
 
-    async def add_one(self, data, current_user) -> model:
+    async def add_one(self, data, current_user) -> Company:
         async for session in get_db():
             data_dict = dict(data)
             query = insert(self.model).values(**data_dict).returning(self.model)
@@ -23,11 +24,14 @@ class CompanyRepository(SQLAlchemyRepository):
             await session.commit()
             return db_company
 
-    async def update_one(self, company_id, data, current_user) -> model:
+    async def update_one(self, company_id, data, current_user) -> Optional[Company]:
         async for session in get_db():
             query = select(Company).where(and_(Company.id == company_id, Company.owner_id == current_user.id))
             result = await session.execute(query)
             db_company = result.scalar_one_or_none()
+            if db_company is None:
+                logger.error(f"Error updating company")
+                raise HTTPException(status_code=404, detail="Company not found")
             for field, value in data.model_dump().items():
                 if value is not None:
                     setattr(db_company, field, value)
@@ -36,7 +40,7 @@ class CompanyRepository(SQLAlchemyRepository):
             await session.refresh(db_company)
             return db_company
 
-    async def delete_one(self, company_id, current_user) -> model:
+    async def delete_one(self, company_id, current_user) -> Optional[Company]:
         async for session in get_db():
             query = select(Company).where(and_(Company.id == company_id, Company.owner_id == current_user.id))
             result = await session.execute(query)
