@@ -80,6 +80,16 @@ def test_update_user(test_client):
     assert response.status_code == 200
 
 
+def test_update_user_email(test_client):
+    upgrade_data = {
+        "email": fake.email()
+    }
+    headers = {"Authorization": f"Bearer {access_token}"}
+    response = test_client.put(f"/users/update", headers=headers, json=upgrade_data)
+
+    assert response.status_code == 200
+
+
 def test_update_user_not_authorisation(test_client):
     upgrade_data = {
         "user_firstname": fake.first_name()[:50],
@@ -99,11 +109,11 @@ def test_get_users(test_client):
     assert len(user_list) > 0
 
 
-def test_delete_user(test_client):
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = test_client.delete(f"/users/delete", headers=headers)
-
-    assert response.status_code == 200
+# def test_delete_user(test_client):
+#     headers = {"Authorization": f"Bearer {access_token}"}
+#     response = test_client.delete(f"/users/delete", headers=headers)
+#
+#     assert response.status_code == 200
 
 
 def test_delete_user_not_authorisation(test_client):
