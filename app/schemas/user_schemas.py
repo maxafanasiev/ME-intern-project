@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional, List
 
 from pydantic import BaseModel, EmailStr, Field
+from pydantic.v1 import validator
 
 
 class User(BaseModel):
@@ -29,6 +30,7 @@ class SignUpRequestModel(BaseModel):
 
 
 class UserUpdateRequestModel(BaseModel):
+    email: Optional[str] = None
     user_firstname: Optional[str] = Field(min_length=1, max_length=50, default=None)
     user_lastname: Optional[str] = Field(min_length=1, max_length=50, default=None)
     user_status: Optional[str] = Field(min_length=1, max_length=50, default=None)
@@ -37,6 +39,12 @@ class UserUpdateRequestModel(BaseModel):
     user_links: Optional[List[str]] = None
     user_avatar: Optional[str] = None
     password: Optional[str] = Field(min_length=8, max_length=50, default=None)
+
+    @validator("email")
+    def prevent_email_change(self, value, values):
+        if value is not None and "email" in values:
+            raise ValueError("changing email is prohibited")
+        return value
 
 
 class UserDetailResponse(BaseModel):
