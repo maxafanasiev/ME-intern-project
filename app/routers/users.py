@@ -5,7 +5,7 @@ from starlette import status
 
 from app.db.models import User
 from app.routers.dependencies import user_service
-from app.schemas.validation_schemas import PaginationQueryParams
+from app.schemas.pagination_schemas import PaginationQueryParams
 from app.services.auth_services import auth
 from app.services.users import UserService
 from app.schemas.user_schemas import User as UserModel, UsersListResponse, UserDetailResponse, UserUpdateRequestModel, \

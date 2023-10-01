@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, ARRAY, DateTime, func, Table, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ARRAY, DateTime, func, Table, ForeignKey, Enum
 from sqlalchemy.orm import declarative_base, relationship
+
 
 Base = declarative_base()
 
@@ -55,3 +56,17 @@ class Company(Base):
     owner = relationship('User', backref='companies')
     admins = relationship('User', secondary=admins_association_table, backref='admins_of_companies')
     members = relationship('User', secondary=members_association_table, backref='member_of_companies')
+
+
+class UsersCompaniesActions(Base):
+    __tablename__ = "users_companies_actions"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    company_id = Column(Integer, ForeignKey('companies.id'))
+    action = Column(Enum('request_invitation', 'request_join', name='ActionEnum'))
+    created_at = Column('created_at', DateTime, default=func.now())
+    updated_at = Column('updated_at', DateTime, default=func.now())
+    user = relationship('User', backref='users_companies_actions')
+    company = relationship('Company', backref='users_companies_actions')
+

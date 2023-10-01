@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
-from app.schemas.user_schemas import User
+from app.schemas.user_schemas import User, UserDetailResponse
 
 
 class Company(BaseModel):
@@ -52,3 +52,7 @@ class CompanyDetailResponse(BaseModel):
 
 class CompanyListResponse(BaseModel):
     companies: List[Company]
+
+
+class CompanyMembersResponse(BaseModel):
+    company_members: List[User]

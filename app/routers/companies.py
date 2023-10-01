@@ -5,11 +5,11 @@ from starlette import status
 
 from app.db.models import User
 from app.routers.dependencies import company_service
-from app.schemas.validation_schemas import PaginationQueryParams
+from app.schemas.pagination_schemas import PaginationQueryParams
 from app.services.auth_services import auth
 from app.services.companies import CompanyService
 from app.schemas.company_schemas import CompanyListResponse, CompanyDetailResponse, CompanyUpdateRequestModel, \
-    CreateCompanyRequestModel
+    CreateCompanyRequestModel, CompanyMembersResponse
 
 router = APIRouter(tags=["companies"])
 
@@ -45,3 +45,11 @@ async def delete_company(company_service: Annotated[CompanyService, Depends(comp
 async def get_companies(company_service: Annotated[CompanyService, Depends(company_service)],
                         params: PaginationQueryParams = Depends()):
     return await company_service.get_all_companies(params.page, params.size)
+
+
+@router.get("/{company_id}/members", response_model=CompanyMembersResponse)
+# @router.get("/{company_id}/members")
+async def get_company_members(company_id: int,
+                               company_service: Annotated[CompanyService, Depends(company_service)],
+                               params: PaginationQueryParams = Depends()):
+    return await company_service.get_company_members(company_id, params.page, params.size)
