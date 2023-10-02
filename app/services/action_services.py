@@ -1,69 +1,117 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy import select, insert, and_, delete
 
-from app.core.logger import logger
-from app.db.models import Company, User, members_association_table, UsersCompaniesActions as Action
+from app.db.models import Company, User, members_association_table as Member, UsersCompaniesActions as Action
+from app.services.exceptions import ActionPermissionException, AlreadyMemberException
 
 
 class ActionService:
 
-    async def has_permission(self, company_id, current_user, session):
-        company = await self.get_company(company_id, session)
-        company_owner_id = company.owner_id
-        return current_user.id == company_owner_id
+    async def get_action(self, action_id, session):
+        query = select(Action).where(Action.id == action_id)
+        res = await session.execute(query)
+        return res.scalar_one_or_none()
 
-    async def get_company(self, company_id, session):
-        query = select(Company).where(Company.id == company_id)
-        result = await session.execute(query)
-        db_company = result.scalar_one_or_none()
-        if db_company is None:
-            logger.error(f"Company id:{company_id} not found")
-            raise HTTPException(status_code=404, detail="Company not found")
-        return db_company
+    async def validate_action(self, user_id, company_id, session):
+        query = select(Action).where(
+            and_(Action.user_id == user_id, Action.company_id == company_id))
+        action = await session.execute(query)
+        if not action.scalar_one_or_none():
+            raise HTTPException(status_code=404, detail="Action not found")
 
-    async def is_user_member_of_company(self, user_id, company_id, session):
+    async def validate_action_exist(self, user_id, company_id, session):
+        query = select(Action).where(
+            and_(Action.user_id == user_id, Action.company_id == company_id))
+        action = await session.execute(query)
+        if action.scalar_one_or_none():
+            raise HTTPException(status_code=404, detail="Action already sent")
+
+    async def validate_action_from_company(self, user_id, company_id: int, session):
+        query = select(Company).where(and_(Company.id == company_id, Company.owner_id == user_id))
+        res = await session.execute(query)
+        company = res.scalar_one_or_none()
+        if not company:
+            raise HTTPException(status_code=404, detail="User is not the owner of the company")
+
+    async def validate_action_from_user(self, user_id, action_id, session):
+        action = await self.get_action(action_id, session)
         query = select().where(
             and_(
-                members_association_table.c.user_id == user_id,
-                members_association_table.c.company_id == company_id
+                Member.c.user_id == user_id,
+                Member.c.company_id == action.company_id
             )
         )
-        result = await session.execute(query)
-        return result.scalar() is not None
+        member = await session.execute(query)
+        if member.scalar_one_or_none():
+            raise AlreadyMemberException
+
+    async def check_company_is_exist(self, company_id, session):
+        query = select(Company).where(Company.id == company_id)
+        company = await session.execute(query)
+        if not company.scalar_one_or_none():
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Company not found")
+
+    async def check_user_is_exist(self, user_id, session):
+        query = select(User).where(User.id == user_id)
+        user = await session.execute(query)
+        if not user.scalar_one_or_none():
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    async def validate_company_owner(self, company_id: int, user_id: int, session):
+        query = select(Company).where(and_(Company.id == company_id, Company.owner_id == user_id))
+        company = await session.execute(query)
+        if not company.scalar_one_or_none():
+            raise ActionPermissionException
+
+    async def check_company_is_visible(self, company_id, session):
+        query = select(Company).where(and_(Company.id == company_id, Company.is_visible is True))
+        company = await session.execute(query)
+        if company.scalar_one_or_none() is None:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Company not visible")
+
+    async def validate_user_is_member(self, user_id, company_id, session):
+        if user_id in await self.get_company_members(company_id, session):
+            return True
+        return False
 
     async def get_company_members(self, company_id, session):
         query = (
             select(User.id)
-            .join(members_association_table, User.id == members_association_table.c.user_id)
-            .where(members_association_table.c.company_id == company_id)
+            .join(Member, User.id == Member.c.user_id)
+            .where(Member.c.company_id == company_id)
         )
         result = await session.execute(query)
         return result.scalars().all()
 
     async def add_member_to_company(self, user_id, company_id, session):
-        data = {"user_id": user_id, "company_id": company_id}
-        query = insert(members_association_table).values(**data).returning(members_association_table)
-        result = await session.execute(query)
-        db_member = result.scalar_one_or_none()
+        query = insert(Member).values(user_id=user_id, company_id=company_id).returning(
+            Member)
+        db_member = await session.execute(query)
         session.commit()
-        return db_member
+        return db_member.scalar_one_or_none()
 
     async def remove_member_from_company(self, user_id, company_id, session):
-        query = delete(members_association_table).where(
+        query = delete(Member).where(
             and_(
-                members_association_table.c.company_id == company_id,
-                members_association_table.c.user_id == user_id
+                Member.c.company_id == company_id,
+                Member.c.user_id == user_id
             )
         )
         await session.execute(query)
         await session.commit()
 
-    async def get_existing_request(self, company_id, user_id, action, session):
-        query = select(Action).where(
-            and_(Action.company_id == company_id, Action.user_id == user_id, Action.action == action)
-        )
-        result = await session.execute(query)
-        return result.scalar_one_or_none()
+    async def accept_action(self, action_id, session):
+        action = await actions.get_action(action_id, session)
+        await self.add_member_to_company(action.user_id, action.company_id, session)
+        await session.delete(action)
+        await session.commit()
+        return action
+
+    async def decline_action(self, action_id, session):
+        action = await actions.get_action(action_id, session)
+        await session.delete(action)
+        await session.commit()
+        return action
 
 
 actions = ActionService()

@@ -13,10 +13,10 @@ class CompanyActionsService:
         return await self.company_action_repo.reject_invitation(invitation_id, current_user)
 
     async def get_all_invitations(self, company_id, current_user: UserModel, page, size):
-        return await self.company_action_repo.get_all_invitations(company_id, current_user, page, size)
+        return await self.company_action_repo.get_all_company_invitations(company_id, current_user, page, size)
 
     async def get_all_join_requests(self, company_id, current_user: UserModel, page, size):
-        return await self.company_action_repo.get_all_join_requests(company_id, current_user, page, size)
+        return await self.company_action_repo.get_all_company_join_requests(company_id, current_user, page, size)
 
     async def accept_join_request(self, join_request_id, current_user: UserModel):
         return await self.company_action_repo.accept_join_request(join_request_id, current_user)

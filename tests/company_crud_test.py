@@ -1,7 +1,37 @@
+import random
+
 from faker import Faker
 
 fake = Faker()
-access_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1heG9sb2xvbG9AZ21haWwuY29tIiwiZmlyc3RfbmFtZSI6Ik1heCIsImxhc3RfbmFtZSI6IkFmYW5hc3lldiIsImlzcyI6Imh0dHBzOi8vbWVkLWludGVybnNoaXAuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTE1ODEyMzA5NzMxMzEzMDIwNTE2IiwiYXVkIjpbImh0dHA6Ly8wLjAuMC4wOjgwMDAvIl0sImlhdCI6MTY5NTkzMzAxNywiZXhwIjoxNjk2MDE5NDE3LCJhenAiOiJGYWE5VURJY0lDQmtmcW43MGxSZ1U4RldmV294SlJIaCIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.01Fz8H_lWCWhNaEHweAxbacZh9AuQk1ohg0I0ffI2hk"
+access_token = None
+
+signup_data = {
+        "user_email": fake.email(),
+        "password": fake.password(length=random.randint(8, 16)),
+    }
+
+
+def test_sign_up(test_client):
+    response = test_client.post("/users/signup", json=signup_data)
+
+    assert response.status_code == 201
+
+    user_data = response.json()
+    assert "id" in user_data
+
+    signup_data.update({"id": user_data["id"]})
+
+
+def test_sign_in(test_client):
+    response = test_client.post("/auth/signin", data={
+        "username": signup_data["user_email"],
+        "password": signup_data["password"]
+    })
+
+    global access_token
+    access_token = response.json()["access_token"]
+    assert response.status_code == 200
+
 
 create_data = {
     "company_name": fake.company()[:50],

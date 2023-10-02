@@ -13,7 +13,7 @@ class UserActionsService:
         return await self.user_actions_repo.reject_join_request(join_request_id, current_user)
 
     async def get_all_invitations_to_user(self, current_user: UserModel, page, size):
-        return await self.user_actions_repo.get_all_invitations_to_user(current_user, page, size)
+        return await self.user_actions_repo.get_all_user_invitations(current_user, page, size)
 
     async def get_all_user_join_requests(self, current_user: UserModel, page, size):
         return await self.user_actions_repo.get_all_user_join_requests(current_user, page, size)

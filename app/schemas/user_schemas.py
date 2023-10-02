@@ -7,8 +7,8 @@ from pydantic import BaseModel, EmailStr, Field, field_validator
 class User(BaseModel):
     id: int
     user_email: str
-    user_firstname: str
-    user_lastname: str
+    user_firstname: Optional[str] = None
+    user_lastname: Optional[str] = None
 
 
 class SingInRequestModel(BaseModel):
