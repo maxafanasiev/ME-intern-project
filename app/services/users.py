@@ -8,10 +8,10 @@ class UserService:
     def __init__(self, user_repo: AbstractRepository):
         self.user_repo: AbstractRepository = user_repo()
 
-    async def create_user(self, user: SignUpRequestModel) -> User:
+    async def create_user(self, user: SignUpRequestModel) -> UserDetailResponse:
         return await self.user_repo.add_one(user)
 
-    async def get_user_by_id(self, user_id: int) -> User:
+    async def get_user_by_id(self, user_id: int) -> UserDetailResponse:
         return await self.user_repo.get_one(user_id)
 
     async def get_all_users(self, page: int, size: int) -> UsersListResponse:
