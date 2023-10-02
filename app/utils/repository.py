@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
+
 from fastapi import HTTPException
 from typing import List, Dict
 
@@ -10,23 +12,23 @@ from app.db.db_connect import get_db
 
 class AbstractRepository(ABC):
     @abstractmethod
-    async def add_one(self, data):
+    async def add_one():
         raise NotImplementedError
 
     @abstractmethod
-    async def get_one(self, model_id: int):
+    async def get_one():
         raise NotImplementedError
 
     @abstractmethod
-    async def get_all(self, page: int, size: int):
+    async def get_all():
         raise NotImplementedError
 
     @abstractmethod
-    async def update_one(self, model_id: int, data):
+    async def update_one():
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_one(self, model_id: int):
+    async def delete_one():
         raise NotImplementedError
 
 
@@ -67,6 +69,7 @@ class SQLAlchemyRepository(AbstractRepository):
                 .returning(self.model)
             )
             res = await session.execute(query)
+            res.updated_at = datetime.now()
             await session.commit()
             return res.scalar_one()
 

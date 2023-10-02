@@ -30,3 +30,4 @@ async def refresh_token(auth_service: Annotated[AuthService, Depends(auth_servic
 @router.get("/me", response_model=UserDetailResponse)
 async def get_current_user(user=Depends(auth.get_current_user)):
     return user
+

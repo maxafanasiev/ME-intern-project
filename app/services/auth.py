@@ -12,4 +12,3 @@ class AuthService:
 
     async def refresh_token(self, credentials: HTTPAuthorizationCredentials) -> TokenModel:
         return await self.auth_repo.refresh_token(credentials)
-
