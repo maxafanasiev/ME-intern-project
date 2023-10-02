@@ -6,7 +6,8 @@ from app.db.models import User as UserModel
 
 
 class CompanyService:
-    def __init__(self, company_repo: AbstractRepository = CompanyRepository):
+    def __init__(self, company_repo=CompanyRepository):
+
         self.company_repo: AbstractRepository = company_repo()
 
     async def create_company(self, company: CreateCompanyRequestModel,
