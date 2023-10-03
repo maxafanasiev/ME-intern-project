@@ -26,3 +26,9 @@ class CompanyActionsService:
 
     async def remove_user_from_company(self, user_id, company_id, current_user: UserModel):
         return await self.company_action_repo.remove_user_from_company(user_id, company_id, current_user)
+
+    async def set_admin_from_member(self, user_id, company_id, current_user: UserModel):
+        return await self.company_action_repo.set_admin_from_member(user_id, company_id, current_user)
+
+    async def remove_admin_from_company(self, user_id, company_id, current_user: UserModel):
+        return await self.company_action_repo.remove_admin_from_company(user_id, company_id, current_user)

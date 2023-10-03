@@ -28,8 +28,8 @@ app.include_router(healthschecker.router)
 app.include_router(users.router, prefix='/users')
 app.include_router(auth.router, prefix='/auth')
 app.include_router(companies.router, prefix='/companies')
-app.include_router(company_actions.router, prefix='/company_actions')
-app.include_router(user_actions.router, prefix='/user_actions')
+app.include_router(company_actions.router, prefix='/company-actions')
+app.include_router(user_actions.router, prefix='/user-actions')
 
 
 @app.on_event("startup")

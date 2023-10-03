@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlalchemy import insert, select, and_
 
 from app.db.db_connect import get_db
@@ -72,3 +73,24 @@ class CompanyActionsRepository:
                 await session.commit()
                 return user
 
+    async def set_admin_from_member(self, user_id, company_id, current_user):
+        async for session in get_db():
+            await actions.check_company_is_exist(company_id, session)
+            await actions.validate_company_owner(company_id, current_user.id, session)
+            user = await UsersRepository().get_one(user_id)
+            if (await actions.validate_user_is_member(user_id, company_id, session)
+                    and not await actions.validate_user_is_admin(user_id, company_id, session)):
+                await actions.add_admin_to_company(user_id, company_id, session)
+                await session.commit()
+                return user
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not a member of company")
+
+    async def remove_admin_from_company(self, user_id, company_id, current_user):
+        async for session in get_db():
+            await actions.check_company_is_exist(company_id, session)
+            await actions.validate_company_owner(company_id, current_user.id, session)
+            user = await UsersRepository().get_one(user_id)
+            if await actions.validate_user_is_admin(user_id, company_id, session):
+                await actions.remove_admin_from_company(user_id, company_id, session)
+                return user
+            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not a admin of company")

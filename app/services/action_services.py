@@ -1,7 +1,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy import select, insert, and_, delete
 
-from app.db.models import Company, User, members_association_table as Member, UsersCompaniesActions as Action
+from app.db.models import Company, User, members_association_table as Member, UsersCompaniesActions as Action, \
+    admins_association_table as Admin
 from app.services.exceptions import ActionPermissionException, AlreadyMemberException
 
 
@@ -63,37 +64,45 @@ class ActionService:
         if not company.scalar_one_or_none():
             raise ActionPermissionException
 
+    async def get_company_users_by_group(self, group, company_id, session):
+        query = (
+            select(User.id)
+            .join(group, User.id == group.c.user_id)
+            .where(group.c.company_id == company_id)
+        )
+        res = await session.execute(query)
+        users = res.scalars().all()
+        return users
+
+    async def get_company_members(self, company_id, session):
+        return await self.get_company_users_by_group(Member, company_id, session)
+
+    async def get_company_admins(self, company_id, session):
+        return await self.get_company_users_by_group(Admin, company_id, session)
+
     async def validate_user_is_member(self, user_id, company_id, session):
         if user_id in await self.get_company_members(company_id, session):
             return True
         return False
 
-    async def get_company_members(self, company_id, session):
-        query = (
-            select(User.id)
-            .join(Member, User.id == Member.c.user_id)
-            .where(Member.c.company_id == company_id)
-        )
-        res = await session.execute(query)
-        members = res.scalars().all()
-        return members
+    async def validate_user_is_admin(self, user_id, company_id, session):
+        if user_id in await self.get_company_admins(company_id, session):
+            return True
+        return False
 
-    async def add_member_to_company(self, user_id, company_id, session):
-        query = insert(Member).values(user_id=user_id, company_id=company_id).returning(
-            Member)
+    async def add_user_to_company(self, group, user_id, company_id, session):
+        query = insert(group).values(user_id=user_id, company_id=company_id).returning(
+            group)
         db_member = await session.execute(query)
         session.commit()
-        return db_member.scalar_one_or_none()
+        res = db_member.scalar_one_or_none()
+        return res
 
-    async def remove_member_from_company(self, user_id, company_id, session):
-        query = delete(Member).where(
-            and_(
-                Member.c.company_id == company_id,
-                Member.c.user_id == user_id
-            )
-        )
-        await session.execute(query)
-        await session.commit()
+    async def add_member_to_company(self, user_id, company_id, session):
+        return await self.add_user_to_company(Member, user_id, company_id, session)
+
+    async def add_admin_to_company(self, user_id, company_id, session):
+        return await self.add_user_to_company(Admin, user_id, company_id, session)
 
     async def accept_action(self, action_id, session):
         action = await actions.get_action(action_id, session)
@@ -107,6 +116,22 @@ class ActionService:
         await session.delete(action)
         await session.commit()
         return action
+
+    async def remove_user_from_company(self, table, user_id, company_id, session):
+        query = delete(table).where(
+            and_(
+                table.c.company_id == company_id,
+                table.c.user_id == user_id
+            )
+        )
+        await session.execute(query)
+        await session.commit()
+
+    async def remove_member_from_company(self, user_id, company_id, session):
+        return await self.remove_user_from_company(Member, user_id, company_id, session)
+
+    async def remove_admin_from_company(self, user_id, company_id, session):
+        return await self.remove_user_from_company(Admin, user_id, company_id, session)
 
 
 actions = ActionService()

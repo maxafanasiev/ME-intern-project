@@ -54,8 +54,8 @@ class Company(Base):
     updated_at = Column('updated_at', DateTime, default=func.now())
     owner_id = Column(Integer, ForeignKey('users.id'))
     owner = relationship('User', backref='companies')
-    admins = relationship('User', secondary=admins_association_table, backref='admins_of_companies')
-    members = relationship('User', secondary=members_association_table, backref='member_of_companies')
+    admins = relationship('User', secondary=admins_association_table, backref='company_admins')
+    members = relationship('User', secondary=members_association_table, backref='company_members')
 
 
 class UsersCompaniesActions(Base):

@@ -21,6 +21,14 @@ class ActionPermissionException(HTTPException):
 class AlreadyMemberException(HTTPException):
     def __init__(self, detail="User already member in this company"):
         super().__init__(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=detail,
+        )
+
+
+class NotMemberException(HTTPException):
+    def __init__(self, detail="User is not a member of the company"):
+        super().__init__(
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=detail,
         )

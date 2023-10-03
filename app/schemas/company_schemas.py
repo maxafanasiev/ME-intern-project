@@ -56,3 +56,7 @@ class CompanyListResponse(BaseModel):
 
 class CompanyMembersResponse(BaseModel):
     company_members: List[User]
+
+
+class CompanyAdminsResponse(BaseModel):
+    company_admins: List[User]

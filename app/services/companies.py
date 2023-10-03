@@ -29,3 +29,6 @@ class CompanyService:
 
     async def get_company_members(self, company_id, page, size):
         return await self.company_repo.get_company_members(company_id, page, size)
+
+    async def get_company_admins(self, company_id, page, size):
+        return await self.company_repo.get_company_admins(company_id, page, size)

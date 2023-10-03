@@ -9,7 +9,7 @@ from app.schemas.pagination_schemas import PaginationQueryParams
 from app.services.auth_services import auth
 from app.services.companies import CompanyService
 from app.schemas.company_schemas import CompanyListResponse, CompanyDetailResponse, CompanyUpdateRequestModel, \
-    CreateCompanyRequestModel, CompanyMembersResponse
+    CreateCompanyRequestModel, CompanyMembersResponse, CompanyAdminsResponse
 
 router = APIRouter(tags=["companies"])
 
@@ -48,8 +48,14 @@ async def get_companies(company_service: Annotated[CompanyService, Depends(compa
 
 
 @router.get("/{company_id}/members", response_model=CompanyMembersResponse)
-# @router.get("/{company_id}/members")
 async def get_company_members(company_id: int,
                                company_service: Annotated[CompanyService, Depends(company_service)],
                                params: PaginationQueryParams = Depends()):
     return await company_service.get_company_members(company_id, params.page, params.size)
+
+
+@router.get("/{company_id}/admins", response_model=CompanyAdminsResponse)
+async def get_company_admins(company_id: int,
+                               company_service: Annotated[CompanyService, Depends(company_service)],
+                               params: PaginationQueryParams = Depends()):
+    return await company_service.get_company_admins(company_id, params.page, params.size)
