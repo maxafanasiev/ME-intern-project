@@ -11,7 +11,7 @@ class UserActionsRepository:
             await actions.validate_action_exist(current_user.id, company_id, session)
 
             data_dict = {"action": "request_join", "company_id": company_id, "user_id": current_user.id}
-            return actions.add_action(data_dict, session)
+            return await actions.add_action(data_dict, session)
 
     async def reject_join_request(self, join_request_id, current_user: UserModel):
         async for session in get_db():
@@ -21,12 +21,14 @@ class UserActionsRepository:
             raise ActionPermissionException
 
     async def get_all_user_join_requests(self, current_user: UserModel, page, size):
-        res = await actions.get_all_action_to_user("request_join", current_user, page, size)
-        return {"user_join_request": res}
+        async for session in get_db():
+            res = await actions.get_all_action_to_user("request_join", current_user, page, size, session)
+            return {"user_join_request": res}
 
     async def get_all_user_invitations(self, current_user: UserModel, page, size):
-        res = await actions.get_all_action_to_user("request_invitation", current_user, page, size)
-        return {"user_invitation": res}
+        async for session in get_db():
+            res = await actions.get_all_action_to_user("request_invitation", current_user, page, size, session)
+            return {"user_invitation": res}
 
     async def accept_invitation(self, invitation_id, current_user: UserModel):
         async for session in get_db():

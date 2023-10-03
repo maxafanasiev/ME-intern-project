@@ -20,18 +20,21 @@ class CompanyActionsRepository:
             return action
 
     async def get_all_company_join_requests(self, company_id, current_user, page, size):
-        res = await actions.get_all_action_to_company("request_join", company_id, current_user, page, size)
-        return {"company_join_request": res}
+        async for session in get_db():
+            res = await actions.get_all_action_to_company("request_join", company_id, current_user, page, size, session)
+            return {"company_join_request": res}
 
     async def get_all_company_invitations(self, company_id, current_user, page, size):
-        res = await actions.get_all_action_to_company("request_invitation", company_id, current_user, page, size)
-        return {"company_invitation": res}
+        async for session in get_db():
+            res = await actions.get_all_action_to_company("request_invitation", company_id, current_user, page, size,
+                                                          session)
+            return {"company_invitation": res}
 
     async def accept_join_request(self, join_request_id, current_user):
         async for session in get_db():
             action = await actions.get_action(join_request_id, session)
             await actions.validate_company_owner(action.company_id, current_user.id, session)
-            if not actions.validate_user_is_member(action.user_id, session):
+            if not await actions.validate_user_is_member(action.user_id, action.company_id, session):
                 return await actions.accept_action(join_request_id, session)
             raise AlreadyMemberException
 
@@ -52,4 +55,3 @@ class CompanyActionsRepository:
                 await session.commit()
                 return user
             raise NotMemberException
-
