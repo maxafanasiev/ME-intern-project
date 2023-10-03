@@ -1,8 +1,9 @@
 from fastapi import HTTPException, status
 
 from app.db.db_connect import get_db
+from app.repository.users import UsersRepository
 from app.services.action_services import actions
-from app.services.exceptions import AlreadyMemberException, NotMemberException
+from app.services.exceptions import AlreadyMemberException, NotMemberException, NotAdminException
 
 
 class CompanyActionsRepository:
@@ -68,7 +69,7 @@ class CompanyActionsRepository:
                 await actions.add_admin_to_company(user_id, company_id, session)
                 await session.commit()
                 return user
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not a member of company")
+            raise NotMemberException
 
     async def remove_admin_from_company(self, user_id, company_id, current_user):
         async for session in get_db():
@@ -78,5 +79,4 @@ class CompanyActionsRepository:
             if await actions.validate_user_is_admin(user_id, company_id, session):
                 await actions.remove_admin_from_company(user_id, company_id, session)
                 return user
-            raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not a admin of company")
-        
+            raise NotAdminException

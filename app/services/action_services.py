@@ -111,8 +111,8 @@ class ActionService:
         query = insert(group).values(user_id=user_id, company_id=company_id).returning(
             group)
         db_member = await session.execute(query)
-        session.commit()
         res = db_member.scalar_one_or_none()
+        session.commit()
         return res
 
     async def add_member_to_company(self, user_id, company_id, session):

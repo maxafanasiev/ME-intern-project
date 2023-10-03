@@ -34,8 +34,8 @@ class NotMemberException(HTTPException):
         )
 
 
-class NotMemberException(HTTPException):
-    def __init__(self, detail="User not member in this company"):
+class NotAdminException(HTTPException):
+    def __init__(self, detail="User not a admin of company"):
         super().__init__(
             status_code=status.HTTP_403_FORBIDDEN,
             detail=detail,
