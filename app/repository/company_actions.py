@@ -72,7 +72,11 @@ class CompanyActionsRepository:
                 return user
             raise NotMemberException
 
-    async def set_admin_from_member(self, user_id, company_id, current_user):
+    async def set_admin_from_member(self,
+                                    user_id: int,
+                                    company_id: int,
+                                    current_user: UserModel
+                                    ) -> Optional[UserModel]:
         async for session in get_db():
             await actions.check_company_is_exist(company_id, session)
             await actions.validate_company_owner(company_id, current_user.id, session)
@@ -84,7 +88,11 @@ class CompanyActionsRepository:
                 return user
             raise NotMemberException
 
-    async def remove_admin_from_company(self, user_id, company_id, current_user):
+    async def remove_admin_from_company(self,
+                                        user_id: int,
+                                        company_id: int,
+                                        current_user: UserModel
+                                        ) -> Optional[UserModel]:
         async for session in get_db():
             await actions.check_company_is_exist(company_id, session)
             await actions.validate_company_owner(company_id, current_user.id, session)
