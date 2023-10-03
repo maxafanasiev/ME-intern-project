@@ -1,7 +1,7 @@
 from app.repository.companies import CompanyRepository
 from app.utils.repository import AbstractRepository
 from app.schemas.company_schemas import CompanyListResponse, CompanyDetailResponse, CompanyUpdateRequestModel, \
-    CreateCompanyRequestModel
+    CreateCompanyRequestModel, CompanyMembersResponse
 from app.db.models import User as UserModel
 
 
@@ -27,5 +27,5 @@ class CompanyService:
     async def delete_company(self, company_id: int, current_user: UserModel) -> CompanyDetailResponse:
         return await self.company_repo.delete_one(company_id, current_user)
 
-    async def get_company_members(self, company_id, page, size):
+    async def get_company_members(self, company_id, page, size) -> CompanyMembersResponse:
         return await self.company_repo.get_company_members(company_id, page, size)
