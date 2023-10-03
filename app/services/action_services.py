@@ -26,12 +26,12 @@ class ActionService:
         if action.scalar_one_or_none():
             raise HTTPException(status_code=404, detail="Action already sent")
 
-    async def validate_action_from_company(self, user_id, company_id: int, session):
-        query = select(Company).where(and_(Company.id == company_id, Company.owner_id == user_id))
+    async def validate_action_from_company(self, company_id, action_id: int, session):
+        query = select(Action).where(and_(Action.company_id == company_id, Action.id == action_id))
         res = await session.execute(query)
         company = res.scalar_one_or_none()
         if not company:
-            raise HTTPException(status_code=404, detail="User is not the owner of the company")
+            raise HTTPException(status_code=404, detail="Not valid action")
 
     async def validate_action_from_user(self, user_id, action_id, session):
         action = await self.get_action(action_id, session)
@@ -63,12 +63,6 @@ class ActionService:
         if not company.scalar_one_or_none():
             raise ActionPermissionException
 
-    async def check_company_is_visible(self, company_id, session):
-        query = select(Company).where(and_(Company.id == company_id, Company.is_visible is True))
-        company = await session.execute(query)
-        if company.scalar_one_or_none() is None:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Company not visible")
-
     async def validate_user_is_member(self, user_id, company_id, session):
         if user_id in await self.get_company_members(company_id, session):
             return True
@@ -80,8 +74,9 @@ class ActionService:
             .join(Member, User.id == Member.c.user_id)
             .where(Member.c.company_id == company_id)
         )
-        result = await session.execute(query)
-        return result.scalars().all()
+        res = await session.execute(query)
+        members = res.scalars().all()
+        return members
 
     async def add_member_to_company(self, user_id, company_id, session):
         query = insert(Member).values(user_id=user_id, company_id=company_id).returning(

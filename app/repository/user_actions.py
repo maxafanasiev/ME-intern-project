@@ -2,6 +2,7 @@ from sqlalchemy import insert, select, and_
 
 from app.db.db_connect import get_db
 from app.db.models import UsersCompaniesActions as Action, User as UserModel
+from app.repository.users import UsersRepository
 from app.services.action_services import actions
 
 
