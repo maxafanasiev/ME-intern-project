@@ -7,17 +7,39 @@ from app.services.exceptions import ActionPermissionException, AlreadyMemberExce
 
 class ActionService:
 
+    async def add_action(self, data_dict, session):
+        query = insert(Action).values(**data_dict).returning(Action)
+        res = await session.execute(query)
+        action = res.scalar_one_or_none()
+        await session.commit()
+        return action
+
     async def get_action(self, action_id, session):
         query = select(Action).where(Action.id == action_id)
         res = await session.execute(query)
-        return res.scalar_one_or_none()
-
-    async def validate_action(self, user_id, company_id, session):
-        query = select(Action).where(
-            and_(Action.user_id == user_id, Action.company_id == company_id))
-        action = await session.execute(query)
-        if not action.scalar_one_or_none():
+        action = res.scalar_one_or_none()
+        if not action:
             raise HTTPException(status_code=404, detail="Action not found")
+        return action
+
+    async def get_all_action_to_user(self, action, current_user, page, size, session):
+        offset = (page - 1) * size
+        query = select(Action).where(
+            and_(Action.user_id == current_user.id, Action.action == action)).offset(
+            offset).limit(size)
+        res = await session.execute(query)
+        actions_ = res.scalars().all()
+        return actions_
+
+    async def get_all_action_to_company(self, action, company_id, current_user, page, size, session):
+        await actions.validate_company_owner(company_id, current_user.id, session)
+        offset = (page - 1) * size
+        query = select(Action).where(
+            and_(Action.company_id == company_id, Action.action == action)).offset(
+            offset).limit(size)
+        res = await session.execute(query)
+        actions_ = res.scalars().all()
+        return actions_
 
     async def validate_action_exist(self, user_id, company_id, session):
         query = select(Action).where(
@@ -25,13 +47,6 @@ class ActionService:
         action = await session.execute(query)
         if action.scalar_one_or_none():
             raise HTTPException(status_code=404, detail="Action already sent")
-
-    async def validate_action_from_company(self, company_id, action_id: int, session):
-        query = select(Action).where(and_(Action.company_id == company_id, Action.id == action_id))
-        res = await session.execute(query)
-        company = res.scalar_one_or_none()
-        if not company:
-            raise HTTPException(status_code=404, detail="Not valid action")
 
     async def validate_action_from_user(self, user_id, action_id, session):
         action = await self.get_action(action_id, session)
@@ -53,9 +68,11 @@ class ActionService:
 
     async def check_user_is_exist(self, user_id, session):
         query = select(User).where(User.id == user_id)
-        user = await session.execute(query)
-        if not user.scalar_one_or_none():
+        res = await session.execute(query)
+        user = res.scalar_one_or_none()
+        if not user:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+        return user
 
     async def validate_company_owner(self, company_id: int, user_id: int, session):
         query = select(Company).where(and_(Company.id == company_id, Company.owner_id == user_id))
@@ -81,9 +98,10 @@ class ActionService:
     async def add_member_to_company(self, user_id, company_id, session):
         query = insert(Member).values(user_id=user_id, company_id=company_id).returning(
             Member)
-        db_member = await session.execute(query)
+        res = await session.execute(query)
+        db_member = res.scalar_one_or_none()
         session.commit()
-        return db_member.scalar_one_or_none()
+        return db_member
 
     async def remove_member_from_company(self, user_id, company_id, session):
         query = delete(Member).where(
