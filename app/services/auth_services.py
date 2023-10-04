@@ -67,7 +67,7 @@ class Auth:
         try:
             payload = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload['scope'] == 'refresh_token':
-                email = payload['email']
+                email = payload['sub']
                 return email
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid scope for token')
         except JWTError:
@@ -134,9 +134,15 @@ class Auth:
         user = await self.get_user_by_email(email, db)
         if user is None and payload['scope'] == 'openid profile email':
             password = await self.get_password_hash(await self.generate_random_password())
+            firstname = "User"
+            lastname = "User"
+            if payload['first_name'] and payload['last_name']:
+                firstname = payload['first_name']
+                lastname = payload['last_name']
+
             new_user = await self.create_auth0_user(email,
-                                                    payload['first_name'],
-                                                    payload['last_name'],
+                                                    firstname,
+                                                    lastname,
                                                     password,
                                                     db)
             return new_user
