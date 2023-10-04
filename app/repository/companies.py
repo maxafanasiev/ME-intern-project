@@ -1,13 +1,12 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from sqlalchemy import insert, select, and_
 
 from app.core.logger import logger
 from app.db.db_connect import get_db
-from app.db.models import Company
-from app.services.auth_services import auth
+from app.db.models import Company, members_association_table, User
 from app.utils.repository import SQLAlchemyRepository
 
 
@@ -51,3 +50,18 @@ class CompanyRepository(SQLAlchemyRepository):
             await session.delete(db_company)
             await session.commit()
             return db_company
+
+    async def get_company_members(self, company_id, page, size):
+        async for session in get_db():
+            offset = (page - 1) * size
+            query = (
+                select(User)
+                .join(members_association_table, User.id == members_association_table.c.user_id)
+                .where(members_association_table.c.company_id == company_id)
+                .offset(offset)
+                .limit(size)
+            )
+            res = await session.execute(query)
+            return {"company_members": res.scalars().all()}
+
+
