@@ -113,15 +113,26 @@ class ActionService:
         await session.execute(query)
         await session.commit()
 
-    async def accept_action(self, action_id, session):
+    async def accept_action(self, action_id, current_user, session):
         action = await actions.get_action(action_id, session)
+        if action.action == 'request_invitation':
+            await actions.validate_company_owner(action.company_id, current_user.id, session)
+
+        if not await actions.validate_user_is_member(current_user.id, action.company_id, session):
+            raise AlreadyMemberException
         await self.add_member_to_company(action.user_id, action.company_id, session)
         await session.delete(action)
         await session.commit()
         return action
 
-    async def decline_action(self, action_id, session):
+    async def decline_action(self, action_id, current_user, session):
         action = await actions.get_action(action_id, session)
+        if action.action == "request_join":
+            if not action.user_id == current_user.id:
+                raise ActionPermissionException
+        elif action.action == "request_invitation":
+            await actions.validate_company_owner(action.company_id, current_user.id, session)
+
         await session.delete(action)
         await session.commit()
         return action
