@@ -1,8 +1,10 @@
 from app.repository.auth import AuthRepository
 from app.repository.companies import CompanyRepository
+from app.repository.quizzes import QuizRepository
 from app.repository.users import UsersRepository
 from app.services.companies import CompanyService
 from app.services.company_actions import CompanyActionsService
+from app.services.quizzes import QuizService
 from app.services.user_actions import UserActionsService
 from app.services.users import UserService
 from app.services.auth import AuthService
@@ -26,3 +28,7 @@ def company_actions_service():
 
 def user_actions_service():
     return UserActionsService()
+
+
+def quiz_service():
+    return QuizService(QuizRepository)

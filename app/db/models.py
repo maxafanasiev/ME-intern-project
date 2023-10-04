@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, ARRAY, DateTime, func, Table, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Boolean, ARRAY, DateTime, func, Table, ForeignKey, Enum, \
+    ForeignKeyConstraint, CheckConstraint
 from sqlalchemy.orm import declarative_base, relationship
 
 
@@ -70,3 +71,46 @@ class UsersCompaniesActions(Base):
     user = relationship('User', backref='users_companies_actions')
     company = relationship('Company', backref='users_companies_actions')
 
+
+class Quiz(Base):
+    __tablename__ = "quizzes"
+    id = Column(Integer, primary_key=True)
+    quiz_name = Column(String(255), nullable=False)
+    quiz_title = Column(String(100), nullable=True)
+    quiz_description = Column(String, nullable=True)
+    quiz_frequency = Column(Integer, default=0)
+    created_at = Column('created_at', DateTime, default=func.now())
+    updated_at = Column('updated_at', DateTime, default=func.now())
+    quiz_company_id = Column(Integer, ForeignKey('companies.id'))
+    company = relationship('Company', backref='companies')
+
+
+class Question(Base):
+    __tablename__ = "questions"
+    id = Column(Integer, primary_key=True)
+    question_text = Column(String(1000), nullable=False)
+    question_answers = Column(ARRAY(String(200)), nullable=False)
+    question_correct_answers = Column(String, nullable=False)
+    created_at = Column('created_at', DateTime, default=func.now())
+    updated_at = Column('updated_at', DateTime, default=func.now())
+    question_quiz_id = Column(Integer, ForeignKey('quizzes.id'))
+    quiz = relationship('Quiz', backref='quizzes')
+
+    __table_args__ = (
+        ForeignKeyConstraint(['question_quiz_id'], ['quizzes.id']),
+        CheckConstraint("array_length(question_answers, 1) >= 2", name="min_answers"),
+    )
+
+
+class Result:
+    __tablename__ = "results"
+    id = Column(Integer, primary_key=True)
+    result_user_id = Column(Integer, ForeignKey('users.id'))
+    resul_company_id = Column(Integer, ForeignKey('companies.id'))
+    result_quiz_id = Column(Integer, ForeignKey('quizzes.id'))
+    result_right_count = Column(Integer, nullable=False, default=0)
+    result_total_count = Column(Integer, nullable=False, default=0)
+    created_at = Column('created_at', DateTime, default=func.now())
+    user = relationship('User', backref='users')
+    company = relationship('Company', backref='companies')
+    quiz = relationship('Quiz', backref='quizzes')
