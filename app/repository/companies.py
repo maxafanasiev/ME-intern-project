@@ -67,8 +67,7 @@ class CompanyRepository(SQLAlchemyRepository):
                 .offset(offset)
                 .limit(size)
             )
-            res = await session.execute(query)
-            return res.scalars().all()
+            return (await session.execute(query)).scalars().all()
 
     async def get_company_members(self, company_id: int, page: int, size: int) -> CompanyMembersResponse:
         return {"company_members": await self._get_company_users(company_id, members_association_table, page, size)}

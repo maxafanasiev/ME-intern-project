@@ -15,8 +15,8 @@ class AuthRepository:
             if user is None or not auth.verify_password(body.password, user.password):
                 logger.error(f"Login error")
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
-            access_token = await auth.create_access_token(data={"sub": user.user_email})
-            refresh_token = await auth.create_refresh_token(data={"sub": user.user_email})
+            access_token = await auth.create_access_token(data={"email": user.user_email})
+            refresh_token = await auth.create_refresh_token(data={"email": user.user_email})
             await auth.update_token(user, refresh_token, session)
             return access_token, refresh_token, "bearer"
 
@@ -29,7 +29,7 @@ class AuthRepository:
                 logger.error(f"Refresh_token error")
                 await auth.update_token(user, None, session)
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
-            access_token = await auth.create_access_token(data={"sub": email})
-            refresh_token = await auth.create_refresh_token(data={"sub": email})
+            access_token = await auth.create_access_token(data={"email": email})
+            refresh_token = await auth.create_refresh_token(data={"email": email})
             await auth.update_token(user, refresh_token, session)
             return access_token, refresh_token, "bearer"
