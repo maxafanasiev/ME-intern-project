@@ -19,4 +19,7 @@ async def init_models():
 
 async def get_db():
     async with AsyncDBSession as session:
-        yield session
+        try:
+            yield session
+        finally:
+            await session.close()
