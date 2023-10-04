@@ -18,10 +18,7 @@ class CompanyActionsRepository:
 
     async def reject_invitation(self, invitation_id: int, current_user: UserModel) -> Optional[Action]:
         async for session in get_db():
-            action = await actions.get_action(invitation_id, session)
-            await actions.validate_company_owner(action.company_id, current_user.id, session)
-            await actions.decline_action(invitation_id, session)
-            return action
+            return await actions.decline_action(invitation_id, current_user, session)
 
     async def get_all_company_join_requests(self,
                                             company_id: int,
@@ -44,18 +41,11 @@ class CompanyActionsRepository:
 
     async def accept_join_request(self, join_request_id: int, current_user: UserModel) -> Optional[Action]:
         async for session in get_db():
-            action = await actions.get_action(join_request_id, session)
-            await actions.validate_company_owner(action.company_id, current_user.id, session)
-            if not await actions.validate_user_is_member(action.user_id, action.company_id, session):
-                return await actions.accept_action(join_request_id, session)
-            raise AlreadyMemberException
+            return await actions.accept_action(join_request_id, current_user, session)
 
     async def reject_join_request(self, join_request_id: int, current_user: UserModel) -> Optional[Action]:
         async for session in get_db():
-            action = await actions.get_action(join_request_id, session)
-            await actions.validate_company_owner(action.company_id, current_user.id, session)
-            await actions.decline_action(join_request_id, session)
-            return action
+            return await actions.decline_action(join_request_id, current_user, session)
 
     async def remove_user_from_company(self,
                                        user_id: int,

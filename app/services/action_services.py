@@ -121,15 +121,26 @@ class ActionService:
     async def add_admin_to_company(self, user_id, company_id, session):
         return await self.add_user_to_company(Admin, user_id, company_id, session)
 
-    async def accept_action(self, action_id, session):
+    async def accept_action(self, action_id, current_user, session):
         action = await actions.get_action(action_id, session)
+        if action.action == 'request_invitation':
+            await actions.validate_company_owner(action.company_id, current_user.id, session)
+
+        if not await actions.validate_user_is_member(current_user.id, action.company_id, session):
+            raise AlreadyMemberException
         await self.add_member_to_company(action.user_id, action.company_id, session)
         await session.delete(action)
         await session.commit()
         return action
 
-    async def decline_action(self, action_id, session):
+    async def decline_action(self, action_id, current_user, session):
         action = await actions.get_action(action_id, session)
+        if action.action == "request_join":
+            if not action.user_id == current_user.id:
+                raise ActionPermissionException
+        elif action.action == "request_invitation":
+            await actions.validate_company_owner(action.company_id, current_user.id, session)
+
         await session.delete(action)
         await session.commit()
         return action
