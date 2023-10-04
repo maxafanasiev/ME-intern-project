@@ -124,11 +124,7 @@ class Auth:
                                db: AsyncSession = Depends(get_db)) -> Optional[User]:
         try:
             payload = await self.decode_and_verify_access_token(token)
-            email = None
-            if payload['scope'] == 'access_token':
-                email = payload["sub"]
-            elif payload['scope'] == 'openid profile email':
-                email = payload["email"]
+            email = payload["sub"]
 
             if email is None:
                 raise CredentialException
