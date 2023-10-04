@@ -124,11 +124,7 @@ class Auth:
                                db: AsyncSession = Depends(get_db)) -> Optional[User]:
         try:
             payload = await self.decode_and_verify_access_token(token)
-            email = None
-            if payload['scope'] == 'access_token':
-                email = payload["sub"]
-            elif payload['scope'] == 'openid profile email':
-                email = payload["email"]
+            email = payload["email"]
 
             if email is None:
                 raise CredentialException
@@ -138,9 +134,15 @@ class Auth:
         user = await self.get_user_by_email(email, db)
         if user is None and payload['scope'] == 'openid profile email':
             password = await self.get_password_hash(await self.generate_random_password())
+            firstname = "User"
+            lastname = "User"
+            if payload['first_name'] and payload['last_name']:
+                firstname = payload['first_name']
+                lastname = payload['last_name']
+
             new_user = await self.create_auth0_user(email,
-                                                    payload['first_name'],
-                                                    payload['last_name'],
+                                                    firstname,
+                                                    lastname,
                                                     password,
                                                     db)
             return new_user

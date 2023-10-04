@@ -2,8 +2,9 @@ from typing import List, Optional
 
 from app.db.db_connect import get_db
 from app.db.models import User as UserModel, UsersCompaniesActions as Action
+from app.repository.users import UsersRepository
 from app.services.action_services import actions
-from app.services.exceptions import AlreadyMemberException, NotMemberException
+from app.services.exceptions import AlreadyMemberException, NotMemberException, NotAdminException
 
 
 class CompanyActionsRepository:
@@ -60,3 +61,33 @@ class CompanyActionsRepository:
                 await session.commit()
                 return user
             raise NotMemberException
+
+    async def set_admin_from_member(self,
+                                    user_id: int,
+                                    company_id: int,
+                                    current_user: UserModel
+                                    ) -> Optional[UserModel]:
+        async for session in get_db():
+            await actions.check_company_is_exist(company_id, session)
+            await actions.validate_company_owner(company_id, current_user.id, session)
+            user = await UsersRepository().get_one(user_id)
+            if (await actions.validate_user_is_member(user_id, company_id, session)
+                    and not await actions.validate_user_is_admin(user_id, company_id, session)):
+                await actions.add_admin_to_company(user_id, company_id, session)
+                await session.commit()
+                return user
+            raise NotMemberException
+
+    async def remove_admin_from_company(self,
+                                        user_id: int,
+                                        company_id: int,
+                                        current_user: UserModel
+                                        ) -> Optional[UserModel]:
+        async for session in get_db():
+            await actions.check_company_is_exist(company_id, session)
+            await actions.validate_company_owner(company_id, current_user.id, session)
+            user = await UsersRepository().get_one(user_id)
+            if await actions.validate_user_is_admin(user_id, company_id, session):
+                await actions.remove_admin_from_company(user_id, company_id, session)
+                return user
+            raise NotAdminException

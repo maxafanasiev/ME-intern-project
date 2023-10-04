@@ -73,3 +73,21 @@ async def remove_user_from_company(user_id: int,
                                        CompanyActionsService, Depends(company_actions_service)],
                                    current_user: User = Depends(auth.get_current_user)):
     return await company_actions_service.remove_user_from_company(user_id, company_id, current_user)
+
+
+@router.post("/set-admin/{company_id}/{user_id}", response_model=UserModel)
+async def set_admin_in_company(user_id: int,
+                               company_id: int,
+                               company_actions_service: Annotated[
+                                   CompanyActionsService, Depends(company_actions_service)],
+                               current_user: User = Depends(auth.get_current_user)):
+    return await company_actions_service.set_admin_from_member(user_id, company_id, current_user)
+
+
+@router.post("/remove-admin/{company_id}/{user_id}", response_model=UserModel)
+async def remove_admin_in_company(user_id: int,
+                               company_id: int,
+                               company_actions_service: Annotated[
+                                   CompanyActionsService, Depends(company_actions_service)],
+                               current_user: User = Depends(auth.get_current_user)):
+    return await company_actions_service.remove_admin_from_company(user_id, company_id, current_user)
