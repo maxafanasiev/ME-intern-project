@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache.backends.redis import RedisBackend
 
 from app.db.db_connect import init_models
-from app.routers import healthschecker, users, auth, companies, company_actions, user_actions
+from app.routers import healthschecker, users, auth, companies, company_actions, user_actions, quizzes, questions
 from app.core.config import FastAPIConfig, RedisConfig, origins
 from app.core.logger import logger
 
@@ -30,6 +30,8 @@ app.include_router(auth.router, prefix='/auth')
 app.include_router(companies.router, prefix='/companies')
 app.include_router(company_actions.router, prefix='/company-actions')
 app.include_router(user_actions.router, prefix='/user-actions')
+app.include_router(quizzes.router, prefix='/quizzes')
+app.include_router(questions.router, prefix='/questions')
 
 
 @app.on_event("startup")

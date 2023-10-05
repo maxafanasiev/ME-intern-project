@@ -107,6 +107,13 @@ class ActionService:
             return True
         return False
 
+    async def validate_user_is_owner(self, user_id, company_id, session):
+        try:
+            await self.validate_company_owner(company_id, user_id, session)
+        except ActionPermissionException:
+            return False
+        return True
+
     async def add_user_to_company(self, group, user_id, company_id, session):
         query = insert(group).values(user_id=user_id, company_id=company_id).returning(
             group)
