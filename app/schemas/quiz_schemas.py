@@ -3,8 +3,6 @@ from typing import Optional, List
 
 from pydantic import BaseModel, Field
 
-from app.schemas.user_schemas import User, UserDetailResponse
-
 
 class CreateQuizRequestModel(BaseModel):
     quiz_name: str

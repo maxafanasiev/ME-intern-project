@@ -35,7 +35,7 @@ async def update_quiz(body: QuizUpdateRequestModel,
     return await quiz_service.update_quiz(quiz_id, body, current_user)
 
 
-@router.delete("/{company_id}", response_model=QuizDetailResponse)
+@router.delete("/{quiz_id}", response_model=QuizDetailResponse)
 async def delete_quiz(quiz_service: Annotated[QuizService, Depends(quiz_service)],
                       quiz_id: int,
                       current_user: User = Depends(auth.get_current_user)):
