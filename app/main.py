@@ -1,21 +1,20 @@
 import uvicorn
-import redis.asyncio as redisio
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache.backends.redis import RedisBackend
 
-from app.db.db_connect import init_models
 from app.routers import healthschecker, users, auth, companies, company_actions, user_actions, quizzes, questions, \
     scores
 from app.core.config import FastAPIConfig, RedisConfig, origins
 from app.core.logger import logger
+from app.db.redis_utils import redis_db
 
 fastapi_settings = FastAPIConfig()
 redis_settings = RedisConfig()
 
-redis = redisio.Redis(host=redis_settings.host, port=redis_settings.port, db=0)
 app = FastAPI()
+redis_connection = None
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,12 +38,14 @@ app.include_router(scores.router, prefix='/scores')
 @app.on_event("startup")
 async def startup_event():
     logger.info("App started")
-    FastAPICache.init(RedisBackend(redis), prefix='app-cache')
+    global redis_connection
+    redis_connection = await redis_db.create_redis_connection()
+    FastAPICache.init(RedisBackend(redis_connection), prefix='app-cache')
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await redis.close()
+    await redis_connection.close()
 
 
 if __name__ == "__main__":
