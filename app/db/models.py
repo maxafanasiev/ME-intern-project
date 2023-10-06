@@ -102,15 +102,15 @@ class Question(Base):
     )
 
 
-class Result:
+class Result(Base):
     __tablename__ = "results"
     id = Column(Integer, primary_key=True)
     result_user_id = Column(Integer, ForeignKey('users.id'))
-    resul_company_id = Column(Integer, ForeignKey('companies.id'))
+    result_company_id = Column(Integer, ForeignKey('companies.id'))
     result_quiz_id = Column(Integer, ForeignKey('quizzes.id'))
     result_right_count = Column(Integer, nullable=False, default=0)
     result_total_count = Column(Integer, nullable=False, default=0)
     created_at = Column('created_at', DateTime, default=func.now())
-    user = relationship('User', backref='users')
-    company = relationship('Company', backref='companies')
-    quiz = relationship('Quiz', backref='quizzes')
+    user = relationship('User', backref='users_result')
+    company = relationship('Company', backref='companies_result')
+    quiz = relationship('Quiz', backref='quizzes_result')

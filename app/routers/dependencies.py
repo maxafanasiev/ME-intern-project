@@ -2,11 +2,13 @@ from app.repository.auth import AuthRepository
 from app.repository.companies import CompanyRepository
 from app.repository.questions import QuestionRepository
 from app.repository.quizzes import QuizRepository
+from app.repository.score import ScoreRepository
 from app.repository.users import UsersRepository
 from app.services.companies import CompanyService
 from app.services.company_actions import CompanyActionsService
 from app.services.questions import QuestionService
 from app.services.quizzes import QuizService
+from app.services.scores import ScoreService
 from app.services.user_actions import UserActionsService
 from app.services.users import UserService
 from app.services.auth import AuthService
@@ -38,3 +40,7 @@ def quiz_service():
 
 def question_service():
     return QuestionService(QuestionRepository)
+
+
+def score_service():
+    return ScoreService(ScoreRepository)

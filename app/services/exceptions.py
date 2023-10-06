@@ -40,3 +40,11 @@ class NotAdminException(HTTPException):
             status_code=status.HTTP_403_FORBIDDEN,
             detail=detail,
         )
+
+
+class NotValidQuizException(HTTPException):
+    def __init__(self, detail="Quiz must have at least 2 questions"):
+        super().__init__(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=detail,
+        )

@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy import insert, select
 
 from app.db.db_connect import get_db
-from app.db.models import Quiz, User as UserModel, Question
+from app.db.models import User as UserModel, Question
 from app.repository.quizzes import QuizRepository
 from app.schemas.question_schemas import QuestionsListResponse
 from app.services.action_services import actions
