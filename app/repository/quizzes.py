@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Optional
 
@@ -10,6 +11,7 @@ from app.services.action_services import actions
 from app.services.exceptions import NotMemberException, NotValidQuizException
 from app.services.result_services import results
 from app.utils.repository import SQLAlchemyRepository
+from app.db.redis_utils import redis_db
 
 
 class QuizRepository(SQLAlchemyRepository):
@@ -81,6 +83,18 @@ class QuizRepository(SQLAlchemyRepository):
                 "result_right_count": question_correct_answers,
                 "result_total_count": result_total_count
             }
+            redis = await redis_db.create_redis_connection()
+
+            quiz_result_key = (f'result:'
+                               f'quiz_{quiz_id}:'
+                               f'user_{data["result_user_id"]}:'
+                               f'company_{data["result_company_id"]}:'
+                               f'score_{format(question_correct_answers/result_total_count, ".2f")}')
+
+            await redis_db.set_data(redis, quiz_result_key, json.dumps(data), expire=172800)
+
+            await redis.close()
+
             query = insert(Result).values(**data).returning(Result)
             res = await session.execute(query)
             await session.commit()
