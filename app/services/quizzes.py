@@ -2,6 +2,9 @@ from typing import Optional
 
 from app.repository.quizzes import QuizRepository
 from app.db.models import User as UserModel, Quiz
+from app.schemas.question_schemas import QuestionsListResponse
+from app.schemas.quiz_schemas import QuizStartRequest
+from app.schemas.quiz_workflow_schemas import QuizResultResponse
 
 
 class QuizService:
@@ -23,3 +26,10 @@ class QuizService:
 
     async def delete_quiz(self, quiz_id: int, current_user: UserModel) -> Optional[Quiz]:
         return await self.quiz_repo.delete_one(quiz_id, current_user)
+
+    async def start_quiz(self, quiz_id: int, current_user: UserModel) -> QuestionsListResponse:
+        return await self.quiz_repo.start_quiz(quiz_id, current_user)
+
+    async def get_quiz_result(self, quiz_id: int, body: QuizStartRequest,
+                              current_user: UserModel) -> QuizResultResponse:
+        return await self.quiz_repo.get_quiz_result(quiz_id, body, current_user)

@@ -1,7 +1,11 @@
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from pydantic import BaseModel, Field
+
+from app.db.models import Company
+from app.schemas.company_schemas import CompanyDetailResponse
+from app.schemas.quiz_workflow_schemas import Answer
 
 
 class CreateQuizRequestModel(BaseModel):
@@ -31,3 +35,10 @@ class QuizDetailResponse(BaseModel):
 
 class QuizListResponse(BaseModel):
     quizzes: List[QuizDetailResponse]
+
+
+class QuizStartRequest(BaseModel):
+    answers: List[Answer]
+
+
+
