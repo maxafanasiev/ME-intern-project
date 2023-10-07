@@ -153,6 +153,7 @@ class AnalyticsRepository:
                     User.id,
                     User.user_firstname,
                     User.user_lastname,
+                    Result.result_quiz_id,
                     func.max(Result.created_at).label('last_completion_time')
                 ).join(
                     Result,
@@ -162,7 +163,8 @@ class AnalyticsRepository:
                 ).group_by(
                     User.id,
                     User.user_firstname,
-                    User.user_lastname
+                    User.user_lastname,
+                    Result.result_quiz_id
                 )
 
                 result = await session.execute(query)
@@ -175,6 +177,7 @@ class AnalyticsRepository:
                         "user_id": row.id,
                         "user_firstname": row.user_firstname,
                         "user_lastname": row.user_lastname,
+                        "quiz_id": row.result_quiz_id,
                         "last_completion_time": row.last_completion_time
                     }
 
