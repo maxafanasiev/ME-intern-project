@@ -3,6 +3,7 @@ import json
 
 from fastapi.responses import FileResponse, JSONResponse
 
+from app.utils.Enum import FileExtension
 from app.db.db_connect import get_db
 from app.db.models import User
 from app.db.redis_utils import redis_db
@@ -13,9 +14,9 @@ from app.services.exceptions import ActionPermissionException, EmptyResponseExce
 
 class ExportDataRepository:
     async def __export_results(self, extension: str, results):
-        if extension == "json":
+        if extension == FileExtension.JSON.value:
             return await self.__export_results_to_json(results)
-        if extension == "csv":
+        if extension == FileExtension.CSV.value:
             return await self.__export_results_to_csv(results)
         raise ValueError("Invalid extension")
 
