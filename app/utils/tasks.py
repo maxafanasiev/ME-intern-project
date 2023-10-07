@@ -10,8 +10,8 @@ from app.repository.notifications_repo import NotificationRepository as Notify
 
 async def check_quiz_completion():
     async for session in get_db():
-        users = await session.execute(select(User))
-        quizzes = await session.execute(select(Quiz))
+        users = (await session.execute(select(User))).scalars().all()
+        quizzes = (await session.execute(select(Quiz))).scalars().all()
 
         for user in users:
             for quiz in quizzes:
@@ -19,6 +19,8 @@ async def check_quiz_completion():
 
                 min_time = datetime.utcnow() - timedelta(days=quiz.quiz_frequency)
 
-                if last_completion_time < min_time:
+                if last_completion_time is None:
+                    pass
+                elif last_completion_time < min_time:
                     await Notify().create_quiz_notification(user.id, quiz.id, session,
                                                             text=f"Complete the quiz: {quiz.quiz_name}")
