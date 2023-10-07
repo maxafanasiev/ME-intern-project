@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 import uvicorn
+from celery import Celery
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,6 +18,16 @@ redis_settings = RedisConfig()
 
 app = FastAPI()
 redis_connection = None
+
+celery = Celery('app', broker=f"redis://{redis_settings.host}:{redis_settings.port}/0")
+
+celery.conf.beat_schedule = {
+    'check-quiz-completion': {
+        'task': 'app.utils.tasks.check_quiz_completion',
+        'schedule': timedelta(days=1),
+        'args': (),
+    },
+}
 
 app.add_middleware(
     CORSMiddleware,
