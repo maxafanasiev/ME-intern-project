@@ -1,11 +1,13 @@
 from app.repository.auth import AuthRepository
 from app.repository.companies import CompanyRepository
+from app.repository.export_data import ExportDataRepository
 from app.repository.questions import QuestionRepository
 from app.repository.quizzes import QuizRepository
 from app.repository.score import ScoreRepository
 from app.repository.users import UsersRepository
 from app.services.companies import CompanyService
 from app.services.company_actions import CompanyActionsService
+from app.services.export_data import ExportDataService
 from app.services.questions import QuestionService
 from app.services.quizzes import QuizService
 from app.services.scores import ScoreService
@@ -44,3 +46,7 @@ def question_service():
 
 def score_service():
     return ScoreService(ScoreRepository)
+
+
+def export_service():
+    return ExportDataService(ExportDataRepository)

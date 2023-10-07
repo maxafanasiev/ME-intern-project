@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_cache.backends.redis import RedisBackend
 
 from app.routers import healthschecker, users, auth, companies, company_actions, user_actions, quizzes, questions, \
-    scores
+    scores, export_data
 from app.core.config import FastAPIConfig, RedisConfig, origins
 from app.core.logger import logger
 from app.db.redis_utils import redis_db
@@ -33,6 +33,7 @@ app.include_router(user_actions.router, prefix='/user-actions')
 app.include_router(quizzes.router, prefix='/quizzes')
 app.include_router(questions.router, prefix='/questions')
 app.include_router(scores.router, prefix='/scores')
+app.include_router(export_data.router, prefix='/export-data')
 
 
 @app.on_event("startup")
