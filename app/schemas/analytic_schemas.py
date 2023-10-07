@@ -59,6 +59,7 @@ class UserLastCompletionTimeAnalytics(BaseModel):
     user_id: int
     user_firstname: str
     user_lastname: str
+    quiz_id: int
     last_completion_time: datetime
 
 
