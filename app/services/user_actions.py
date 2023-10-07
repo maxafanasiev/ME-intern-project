@@ -1,7 +1,9 @@
+from typing import Dict, Any
+
 from app.repository.user_actions import UserActionsRepository
 from app.db.models import User as UserModel
 from app.schemas.action_schemas import ActionDetailResponse, UserInvitationListResponse, \
-    UserJoinRequestListResponse
+    UserJoinRequestListResponse, ListNotificationsResponse, NotificationResponse
 from app.schemas.user_schemas import UserDetailResponse
 
 
@@ -35,3 +37,9 @@ class UserActionsService:
 
     async def leave_from_company(self, company_id, current_user: UserModel) -> UserDetailResponse:
         return await self.user_actions_repo.leave_from_company(company_id, current_user)
+
+    async def get_all_notifications(self, current_user: UserModel) -> Dict:
+        return await self.user_actions_repo.get_all_notifications(current_user)
+
+    async def read_notification(self, notification_id: int, current_user: UserModel) -> NotificationResponse:
+        return await self.user_actions_repo.read_notification(notification_id, current_user)
