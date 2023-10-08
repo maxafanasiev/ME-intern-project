@@ -67,7 +67,7 @@ class Auth:
         try:
             payload = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHM])
             if payload['scope'] == 'refresh_token':
-                email = payload['sub']
+                email = payload['email']
                 return email
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid scope for token')
         except JWTError:

@@ -64,9 +64,10 @@ class QuizRepository(SQLAlchemyRepository):
     async def start_quiz(self, quiz_id, current_user):
         async for session in get_db():
             quiz = await self.get_one(quiz_id)
-            questions = await results.get_all_questions_in_quiz(quiz_id, session)
-            if not await actions.validate_user_is_member(current_user.id, quiz.quiz_company_id, session):
+            if (not await actions.validate_user_is_member(current_user.id, quiz.quiz_company_id, session)
+                    and not await actions.validate_user_is_owner(current_user.id, quiz.quiz_company_id, session)):
                 raise NotMemberException
+            questions = await results.get_all_questions_in_quiz(quiz_id, session)
             if len(questions) < 2:
                 raise NotValidQuizException
             return {"questions": questions}
@@ -91,7 +92,7 @@ class QuizRepository(SQLAlchemyRepository):
                                f'quiz_{quiz_id}:'
                                f'user_{data["result_user_id"]}:'
                                f'company_{data["result_company_id"]}:'
-                               f'score_{format(question_correct_answers/result_total_count, ".2f")}')
+                               f'score_{format(question_correct_answers / result_total_count, ".2f")}')
 
             await redis_db.set_data(redis, quiz_result_key, json.dumps(data), expire=172800)
 

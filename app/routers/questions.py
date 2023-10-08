@@ -13,7 +13,9 @@ from app.schemas.question_schemas import QuestionDetailResponse, QuestionsListRe
 router = APIRouter(tags=["questions"])
 
 
-@router.post("/", response_model=QuestionDetailResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/add-question-to-quiz/{quiz_id}",
+             response_model=QuestionDetailResponse,
+             status_code=status.HTTP_201_CREATED)
 async def create_question(body: CreateQuestionRequestModel,
                           quiz_id: int,
                           question_service: Annotated[QuestionService, Depends(question_service)],
@@ -41,7 +43,7 @@ async def delete_question(question_service: Annotated[QuestionService, Depends(q
     return await question_service.delete_question(question_id, current_user)
 
 
-@router.get("/", response_model=QuestionsListResponse)
+@router.get("/all-in-quiz/{quiz_id}", response_model=QuestionsListResponse)
 async def get_question_in_quiz(quiz_id: int,
                                question_service: Annotated[QuestionService, Depends(question_service)]):
     return await question_service.get_all_question_in_quiz(quiz_id)

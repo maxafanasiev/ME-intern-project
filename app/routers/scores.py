@@ -9,7 +9,7 @@ from app.services.scores import ScoreService
 router = APIRouter(tags=["scores"])
 
 
-@router.get("{user_id}/{company_id}", response_model=RatingInCompany)
+@router.get("/{user_id}/{company_id}", response_model=RatingInCompany)
 async def get_user_score_in_company(user_id: int,
                                     company_id: int,
                                     score_service: Annotated[ScoreService, Depends(score_service)]):
