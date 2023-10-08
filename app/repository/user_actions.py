@@ -5,7 +5,7 @@ from sqlalchemy import select
 from app.db.db_connect import get_db
 from app.db.models import User as UserModel, UsersCompaniesActions as Action, Notification
 from app.services.action_services import actions
-from app.services.exceptions import ActionPermissionException, NotMemberException
+from app.services.exceptions import ActionPermissionException, NotMemberException, EmptyResponseException
 
 
 class UserActionsRepository:
@@ -57,6 +57,8 @@ class UserActionsRepository:
     async def read_notification(self, notification_id: int, current_user: UserModel) -> Optional[Notification]:
         async for session in get_db():
             notification = await session.get(Notification, notification_id)
+            if not notification:
+                raise EmptyResponseException
             if notification.user_id == current_user.id:
                 notification.status = "read"
                 await session.commit()
