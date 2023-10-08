@@ -1,37 +1,6 @@
-import random
-
 from faker import Faker
 
 fake = Faker()
-access_token = None
-
-signup_data = {
-        "user_email": fake.email(),
-        "password": fake.password(length=random.randint(8, 16)),
-    }
-
-
-def test_sign_up(test_client):
-    response = test_client.post("/users/signup", json=signup_data)
-
-    assert response.status_code == 201
-
-    user_data = response.json()
-    assert "id" in user_data
-
-    signup_data.update({"id": user_data["id"]})
-
-
-def test_sign_in(test_client):
-    response = test_client.post("/auth/signin", data={
-        "username": signup_data["user_email"],
-        "password": signup_data["password"]
-    })
-
-    global access_token
-    access_token = response.json()["access_token"]
-    assert response.status_code == 200
-
 
 create_data = {
     "company_name": fake.company()[:50],
@@ -45,9 +14,8 @@ create_data = {
 }
 
 
-def test_create_company(test_client):
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = test_client.post("/companies/", json=create_data, headers=headers)
+def test_create_company(authorized_client):
+    response = authorized_client.post("/companies/", json=create_data)
 
     assert response.status_code == 201
 
@@ -77,14 +45,13 @@ def test_get_company_not_found(test_client):
     assert response.status_code == 404
 
 
-def test_update_company(test_client):
+def test_update_company(authorized_client):
     company_id = create_data["id"]
     upgrade_data = {
         "company_city": fake.city()[:50],
         "company_phone": fake.phone_number()[:15]
     }
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = test_client.put(f"/companies/{company_id}", headers=headers, json=upgrade_data)
+    response = authorized_client.put(f"/companies/{company_id}", json=upgrade_data)
 
     assert response.status_code == 200
 
@@ -116,9 +83,8 @@ def test_delete_company_not_authorisation(test_client):
     assert response.status_code == 401
 
 
-def test_delete_company(test_client):
+def test_delete_company(authorized_client):
     company_id = create_data["id"]
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = test_client.delete(f"/companies/{company_id}", headers=headers)
+    response = authorized_client.delete(f"/companies/{company_id}")
 
     assert response.status_code == 200
