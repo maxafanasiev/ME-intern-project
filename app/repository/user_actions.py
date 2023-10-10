@@ -59,11 +59,11 @@ class UserActionsRepository:
             notification = await session.get(Notification, notification_id)
             if not notification:
                 raise EmptyResponseException
-            if notification.user_id == current_user.id:
-                notification.status = "read"
-                await session.commit()
-                return notification
-            raise ActionPermissionException
+            if not notification.user_id == current_user.id:
+                raise ActionPermissionException
+            notification.status = "read"
+            await session.commit()
+            return notification
 
 
 
