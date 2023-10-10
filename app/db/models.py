@@ -114,3 +114,15 @@ class Result(Base):
     user = relationship('User', backref='users_result')
     company = relationship('Company', backref='companies_result')
     quiz = relationship('Quiz', backref='quizzes_result')
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    created_at = Column(DateTime, default=func.now())
+    status = Column(Enum('unread', 'read', name='NotificationStatusEnum'), default='unread')
+    text = Column(String, nullable=False)
+
+    user = relationship('User', backref='notifications')

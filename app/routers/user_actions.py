@@ -10,7 +10,8 @@ from app.services.auth_services import auth
 from app.services.user_actions import UserActionsService
 from app.routers.dependencies import user_actions_service
 from app.schemas.user_schemas import User as UserModel
-from app.schemas.action_schemas import ActionDetailResponse, UserInvitationListResponse, UserJoinRequestListResponse
+from app.schemas.action_schemas import ActionDetailResponse, UserInvitationListResponse, UserJoinRequestListResponse, \
+    ListNotificationsResponse, NotificationResponse
 
 router = APIRouter(tags=["user-actions"])
 
@@ -67,3 +68,16 @@ async def leave_from_company(company_id: int,
                                  UserActionsService, Depends(user_actions_service)],
                              current_user: User = Depends(auth.get_current_user)):
     return await user_actions_service.leave_from_company(company_id, current_user)
+
+
+@router.post("/notifications", response_model=ListNotificationsResponse)
+async def get_all_notification(user_actions_service: Annotated[UserActionsService, Depends(user_actions_service)],
+                             current_user: User = Depends(auth.get_current_user)):
+    return await user_actions_service.get_all_notifications(current_user)
+
+
+@router.post("/notifications/{notification_id}/read", response_model=NotificationResponse)
+async def mark_notification_as_read(notification_id: int,
+                             user_actions_service: Annotated[UserActionsService, Depends(user_actions_service)],
+                             current_user: User = Depends(auth.get_current_user)):
+    return await user_actions_service.read_notification(notification_id, current_user)

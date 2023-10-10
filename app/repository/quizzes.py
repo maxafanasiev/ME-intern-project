@@ -6,6 +6,7 @@ from sqlalchemy import insert, select
 
 from app.db.db_connect import get_db
 from app.db.models import Quiz, User as UserModel, Result
+from app.repository.notifications_repo import NotificationRepository as notify
 from app.schemas.quiz_schemas import QuizListResponse
 from app.services.action_services import actions
 from app.services.exceptions import NotMemberException, NotValidQuizException
@@ -27,6 +28,7 @@ class QuizRepository(SQLAlchemyRepository):
                 db_quiz = res.scalar_one()
                 db_quiz.quiz_company_id = company_id
                 await session.commit()
+                await self.__send_notifications_to_users_in_company(db_quiz.id, company_id)
                 return db_quiz
 
     async def update_one(self, quiz_id: int, data, current_user: UserModel) -> Optional[Quiz]:
@@ -99,3 +101,9 @@ class QuizRepository(SQLAlchemyRepository):
             res = await session.execute(query)
             await session.commit()
             return res.scalar_one()
+
+    async def __send_notifications_to_users_in_company(self, quiz_id, company_id):
+        async for session in get_db():
+            members_ids = await actions.get_company_members(company_id, session)
+            for member_id in members_ids:
+                await notify().create_quiz_notification(member_id, quiz_id, session)

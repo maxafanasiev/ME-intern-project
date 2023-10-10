@@ -36,3 +36,13 @@ class CompanyJoinRequestListResponse(BaseModel):
     company_join_request: List[Action]
 
 
+class NotificationResponse(BaseModel):
+    id: int
+    user_id: int
+    created_at: datetime
+    status: str
+    text: str
+
+
+class ListNotificationsResponse(BaseModel):
+    notifications: List[NotificationResponse]
