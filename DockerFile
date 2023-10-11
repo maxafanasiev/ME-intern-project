@@ -15,4 +15,6 @@ EXPOSE ${SERVER_PORT}
 
 COPY . .
 
-CMD ["app.sh"]
+RUN alembic upgrade heads
+
+CMD ["python", "app.main"]
