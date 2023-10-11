@@ -17,4 +17,4 @@ COPY . .
 
 RUN alembic upgrade heads
 
-CMD ["python", "app.main"]
+CMD ["python", "app/main.py"]
