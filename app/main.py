@@ -9,12 +9,14 @@ from app.routers import healthschecker, users, auth, companies, company_actions,
 from app.core.config import FastAPIConfig, RedisConfig, origins
 from app.core.logger import logger
 from app.db.redis_utils import redis_db
+from app.utils.scheduler import scheduler_app
 
 fastapi_settings = FastAPIConfig()
 redis_settings = RedisConfig()
 
 app = FastAPI()
 redis_connection = None
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,6 +42,7 @@ app.include_router(analytics.router, prefix='/analytics')
 @app.on_event("startup")
 async def startup_event():
     logger.info("App started")
+    scheduler_app.start()
     global redis_connection
     redis_connection = await redis_db.create_redis_connection()
     FastAPICache.init(RedisBackend(redis_connection), prefix='app-cache')
@@ -47,8 +50,10 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
+    scheduler_app.shutdown()
     await redis_connection.close()
 
 
 if __name__ == "__main__":
     uvicorn.run('main:app', host=fastapi_settings.host, port=fastapi_settings.port, reload=fastapi_settings.reload)
+

@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, func
 
 from app.db.db_connect import get_db
 from app.db.models import Quiz, User as UserModel, Result
@@ -107,3 +107,16 @@ class QuizRepository(SQLAlchemyRepository):
             members_ids = await actions.get_company_members(company_id, session)
             for member_id in members_ids:
                 await notify().create_quiz_notification(member_id, quiz_id, session)
+
+    async def get_last_completion_time(self, user_id, quiz_id, session):
+        subquery = select(func.max(Result.created_at).label('max_created_at')).where(
+            (Result.result_user_id == user_id) &
+            (Result.result_quiz_id == quiz_id)
+        ).group_by(Result.result_user_id, Result.result_quiz_id).alias('subquery')
+
+        query = select(subquery.c.max_created_at).order_by(subquery.c.max_created_at.desc()).limit(1)
+
+        result = await session.execute(query)
+        last_completion_time = result.scalar()
+
+        return last_completion_time
