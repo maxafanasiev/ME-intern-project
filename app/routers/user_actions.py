@@ -70,7 +70,7 @@ async def leave_from_company(company_id: int,
     return await user_actions_service.leave_from_company(company_id, current_user)
 
 
-@router.post("/notifications", response_model=ListNotificationsResponse)
+@router.get("/notifications", response_model=ListNotificationsResponse)
 async def get_all_notification(user_actions_service: Annotated[UserActionsService, Depends(user_actions_service)],
                              current_user: User = Depends(auth.get_current_user)):
     return await user_actions_service.get_all_notifications(current_user)

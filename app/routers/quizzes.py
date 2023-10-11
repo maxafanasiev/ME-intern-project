@@ -16,7 +16,7 @@ from app.schemas.quiz_schemas import QuizDetailResponse, QuizUpdateRequestModel,
 router = APIRouter(tags=["quizzes"])
 
 
-@router.post("/", response_model=QuizDetailResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/{company_id}", response_model=QuizDetailResponse, status_code=status.HTTP_201_CREATED)
 async def create_quiz(body: CreateQuizRequestModel,
                       company_id: int,
                       quiz_service: Annotated[QuizService, Depends(quiz_service)],
@@ -24,7 +24,7 @@ async def create_quiz(body: CreateQuizRequestModel,
     return await quiz_service.create_quiz(body, company_id, current_user)
 
 
-@router.get("/{quiz_id}", response_model=QuizDetailResponse)
+@router.get("/quiz/{quiz_id}", response_model=QuizDetailResponse)
 async def get_quiz_by_id(quiz_id: int, quiz_service: Annotated[QuizService, Depends(quiz_service)]):
     return await quiz_service.get_quiz_by_id(quiz_id)
 
@@ -44,21 +44,21 @@ async def delete_quiz(quiz_service: Annotated[QuizService, Depends(quiz_service)
     return await quiz_service.delete_quiz(quiz_id, current_user)
 
 
-@router.get("/", response_model=QuizListResponse)
+@router.get("/{company_id}", response_model=QuizListResponse)
 async def get_quizzes_in_company(company_id: int,
                                  quiz_service: Annotated[QuizService, Depends(quiz_service)],
                                  params: PaginationQueryParams = Depends()):
     return await quiz_service.get_all_quizzes_in_company(company_id, params.page, params.size)
 
 
-@router.post("/{quiz_id}/start", response_model=QuestionsListResponse)
+@router.post("/start/{quiz_id}", response_model=QuestionsListResponse)
 async def start_quiz(quiz_id: int,
                      quiz_service: Annotated[QuizService, Depends(quiz_service)],
                      current_user: User = Depends(auth.get_current_user)):
     return await quiz_service.start_quiz(quiz_id, current_user)
 
 
-@router.post("/{quiz_id}/submit", response_model=QuizResultResponse)
+@router.post("/submit/{quiz_id}", response_model=QuizResultResponse)
 async def finish_quiz(body: QuizStartRequest,
                       quiz_id: int,
                       quiz_service: Annotated[QuizService, Depends(quiz_service)],

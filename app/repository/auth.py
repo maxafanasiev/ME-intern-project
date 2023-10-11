@@ -12,7 +12,7 @@ class AuthRepository:
     async def login(self, body: OAuth2PasswordRequestForm) -> Tuple:
         async for session in get_db():
             user = await auth.get_user_by_email(body.username, session)
-            if user is None or not auth.verify_password(body.password, user.password):
+            if user is None or not await auth.verify_password(body.password, user.password):
                 logger.error(f"Login error")
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
             access_token = await auth.create_access_token(data={"email": user.user_email})

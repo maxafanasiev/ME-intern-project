@@ -42,7 +42,7 @@ async def export_user_result_in_company_csv(
     return await export_service.export_user_result_in_company_csv(user_id, company_id, current_user)
 
 
-@router.get("/company/{company_id}/json")
+@router.get("/company/json/{company_id}")
 async def export_all_users_result_in_company_json(
         company_id: int,
         export_service: Annotated[ExportDataService, Depends(export_service)],
@@ -50,7 +50,7 @@ async def export_all_users_result_in_company_json(
     return await export_service.export_all_users_result_in_company_json(company_id, current_user)
 
 
-@router.get("/company/{company_id}/csv")
+@router.get("/company/csv/{company_id}")
 async def export_all_users_result_in_company_csv(
         company_id: int,
         export_service: Annotated[ExportDataService, Depends(export_service)],

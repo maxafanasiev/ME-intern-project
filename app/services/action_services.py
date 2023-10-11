@@ -133,7 +133,7 @@ class ActionService:
         if action.action == 'request_invitation':
             await actions.validate_company_owner(action.company_id, current_user.id, session)
 
-        if not await actions.validate_user_is_member(current_user.id, action.company_id, session):
+        if await actions.validate_user_is_member(current_user.id, action.company_id, session):
             raise AlreadyMemberException
         await self.add_member_to_company(action.user_id, action.company_id, session)
         await session.delete(action)
