@@ -1,0 +1,9 @@
+README.md
+.gitignore
+__pycache__
+.dockerignore
+.git/
+postgres-data
+docker-compose.yml
+.idea/
+.DS_Store
